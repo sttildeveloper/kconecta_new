@@ -1,0 +1,253 @@
+@import url("../config.css");
+.nav__container-all{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.nav__container-all .nav__container-main{
+    position: relative;
+    width: 16rem;
+    height: 100vh;
+    box-shadow: 1px 1px 10px rgb(167, 160, 160);
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    padding: .6rem;
+    padding-right: 0;
+    overflow: hidden;
+    transition: .3s;
+    background-color: white;
+    z-index: 12;
+}
+.nav__container-all .nav__container-body .btn-open-nav{
+    background-color: rgba(240, 240, 240, 0.716);
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    position: fixed;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    top: .4rem;
+    left: .4rem;
+    z-index: 12;
+}
+.nav__container-all .nav__container-main .btn-close-nav{
+    background-color: rgb(240, 240, 240);
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: .4rem;
+    right: .4rem;
+}
+.nav__container-all .nav__container-body .btn-open-nav svg,
+.nav__container-all .nav__container-main .btn-close-nav svg{
+    stroke: rgb(200, 201, 208);
+}
+.nav__container-all .nav__container-body .btn-open-nav:hover
+.nav__container-all .nav__container-main .btn-close-nav:hover{
+    background-color: rgb(230, 230, 230);
+}
+.nav__container-all .nav__container-body .btn-open-nav:hover svg,
+.nav__container-all .nav__container-main .btn-close-nav:hover svg{
+    stroke: rgb(135, 122, 122);
+}
+
+
+
+.nav__container-all .nav__container-main .nav__container-logo{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: .6rem;
+}
+.nav__container-all .nav__container-main .nav__container-logo img{
+    margin-top: 1rem;
+    width: 6rem;
+}
+.nav__container-all .nav__container-main .nav__container-button-main{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    column-gap: .4rem;
+    row-gap: .6rem;
+    margin-top: 1rem;
+}
+.nav__container-all .nav__container-main .nav__container-button-main a{
+    width: 100%;
+    padding-right: .8rem;
+}
+.nav__container-all .nav__container-main .nav__container-button-main a button{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: .4rem;
+    background-color: var(--color-main-1);
+    color: white;
+    width: 100%;
+}
+.nav__container-all .nav__container-main .nav__container-buttons{
+    width: 100%;
+    min-height: 6rem;
+    /* height: 70%; */
+    overflow-y: auto;
+    margin-top: 1rem;
+    border-radius: .6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    row-gap: .4rem;
+    padding-right: .6rem;
+}
+.nav__container-all .nav__container-main .nav__container-buttons::-webkit-scrollbar{
+    width: 4px;
+    background-color: white;
+}
+.nav__container-all .nav__container-main .nav__container-buttons::-webkit-scrollbar-thumb{
+    background-color: #328bf12d;
+    border-radius: 3px;
+}
+.nav__container-all .nav__container-main .nav__container-buttons a{
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-shrink: 0;
+    column-gap: .4rem;
+    padding: .6rem;
+    fill: rgb(70, 64, 64);
+    color: rgb(70, 64, 64);
+    font-weight: 500;
+    border-radius: .8rem;
+}
+.nav__container-all .nav__container-main .nav__container-buttons svg{
+    flex-shrink: 0;
+}
+.nav__container-all .nav__container-main .nav__container-buttons a:hover{
+    background-color: var(--color-main-1);
+    color: white;
+    fill: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.nav__container-all .nav__container-body{
+    width: calc(100% - 16rem);
+    height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    position: relative;
+}
+.nav__container-all .nav__container-body .nav__container-body__mask{
+    padding: .8rem;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+.nav__container-all .nav__container-body::-webkit-scrollbar{
+    width: 4px;
+    background-color: white;
+}
+.nav__container-all .nav__container-body::-webkit-scrollbar-thumb{
+    border-radius: .2rem;
+    background-color: var(--color-main-1);
+}
+.nav__container-all .nav__container-body .header-body-main-view-data-user{
+    width: 100%;
+    height: 4rem;
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .6rem;
+    padding-right: 0;
+    background-color: var(--color-main-1);
+    color: white;
+    z-index: 3;
+}
+.nav__container-all .nav__container-body .header-body-main-view-data-user h2{
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    column-gap: .4rem;
+    white-space: nowrap;
+}
+
+
+
+
+
+
+
+
+
+/* Loader classroom */
+ /* Contenedor del loader */
+ .loader-container-type-classroom {
+    position: fixed;
+    top: 0rem;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background-color: #ecf5ff;
+    overflow: hidden;
+    display: none;
+    z-index: 13;
+}
+
+/* Línea de carga */
+.loader-line-type-classroom {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, #a1cdff 0%, #328af1 20%, transparent 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: continuous-slide 2s infinite linear;
+}
+
+@keyframes continuous-slide {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+/* en loader classrom */
+
+
+.nav__container-all .nav__container-body .notification{
+    position: fixed;
+    top: .6rem;
+    right: .6rem;
+    width: fit-content;
+    max-width: 18rem;
+    z-index: 10;
+    background-color: var(--color-main-1);
+    color: white;
+}

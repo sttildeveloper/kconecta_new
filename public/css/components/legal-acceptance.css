@@ -1,0 +1,63 @@
+.legal-acceptance {
+    width: 100%;
+    margin: 0.85rem 0 0;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid #dce5ea;
+    border-radius: 0.65rem;
+    background: #f8fbfc;
+    text-align: left;
+}
+
+.legal-acceptance legend {
+    padding: 0 0.25rem;
+    color: #243b5a;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.legal-acceptance .legal-acceptance__option {
+    display: flex;
+    width: 100%;
+    margin: 0.35rem 0 0;
+    gap: 0.55rem;
+    align-items: flex-start;
+    color: #52647a;
+    cursor: pointer;
+    font-size: 0.68rem;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.legal-acceptance .legal-acceptance__option input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 1rem;
+    height: 1rem;
+    margin: 0.1rem 0 0;
+    padding: 0;
+    accent-color: #1098a8;
+}
+
+.legal-acceptance .legal-acceptance__option span {
+    display: inline;
+    width: auto;
+    color: inherit;
+    font-size: inherit;
+    text-align: left;
+}
+
+.legal-acceptance .legal-acceptance__option a {
+    margin: 0;
+    color: #087f8c;
+    font-size: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.legal-acceptance small {
+    display: block;
+    margin-top: 0.5rem;
+    color: #6f7c8e;
+    font-size: 0.62rem;
+    line-height: 1.4;
+    text-align: left;
+}

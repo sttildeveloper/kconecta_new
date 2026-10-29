@@ -1,0 +1,190 @@
+:root {
+    --background: #fdfdfd; /* Lighter background */
+    --foreground: #1a1a1a; /* Slightly darker text */
+    --card: #ffffff;
+    --card-foreground: #1a1a1a;
+    --border: #f0f0f0; /* Very light border */
+    --input: #ffffff; /* White input background */
+    --primary: #007bff; /* Consistent primary color */
+    --primary-foreground: #ffffff;
+    --secondary: #f6f6f6; /* Lighter secondary for file input button */
+    --secondary-foreground: #333333; /* Darker text for secondary */
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --ring: #007bff;
+    --radius: 0.375rem; /* Smaller border radius for minimalist feel */
+}
+
+.container-main{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+}
+.form-container {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Softer shadow */
+    padding: 25px; /* Slightly reduced padding */
+    width: 100%;
+    max-width: 65rem; /* Slightly narrower max-width */
+    border: 1px solid var(--border); /* Very subtle border */
+}
+
+.form-container h2 {
+    font-size: 1.6rem; /* Slightly smaller title */
+    font-weight: 600;
+    margin-bottom: 20px; /* Reduced margin */
+    color: var(--card-foreground);
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px; /* Reduced margin between groups */
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem; /* Slightly smaller label font */
+    font-weight: 500;
+    margin-bottom: 6px; /* Reduced margin */
+    color: var(--card-foreground);
+}
+
+.form-group input[type="text"],
+.form-group input[type="file"],
+.form-group textarea,
+.form-group select {
+    width: calc(100% - 16px); /* Adjusted for padding */
+    padding: 8px; /* Reduced padding */
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.95rem; /* Slightly smaller input font */
+    color: var(--foreground);
+    background-color: var(--input);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="file"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1); /* Softer focus shadow */
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 90px; /* Slightly smaller textarea */
+    resize: vertical;
+}
+
+.form-group input[type="file"] {
+    padding: 6px 8px; /* Adjusted padding for file input */
+    background-color: var(--secondary); /* Lighter background */
+    cursor: pointer;
+}
+
+.form-group input[type="file"]::file-selector-button {
+    background-color: var(--secondary-foreground);
+    color: var(--secondary);
+    padding: 6px 10px; /* Reduced padding */
+    border: none;
+    border-radius: calc(var(--radius) - 2px);
+    cursor: pointer;
+    margin-right: 8px; /* Reduced margin */
+    transition: background-color 0.2s ease;
+}
+
+.form-group input[type="file"]::file-selector-button:hover {
+    background-color: #555555; /* Slightly darker on hover */
+}
+
+/* Image preview styling */
+.image-preview-container {
+    margin-top: 10px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px; /* Minimum height for the preview area */
+    background-color: var(--secondary);
+    overflow: hidden;
+}
+
+.image-preview-container img {
+    max-width: 100%;
+    max-height: 150px; /* Limit image height in preview */
+    border-radius: var(--radius);
+    object-fit: contain; /* Ensure the whole image is visible */
+}
+
+.image-preview-container .placeholder-text {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 10px 15px; /* Reduced padding */
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem; /* Slightly smaller font */
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 123, 255, 0.1); /* Softer button shadow */
+}
+
+.submit-button:hover {
+    background-color: #0069d9; /* Slightly darker primary on hover */
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.2); /* Slightly more prominent shadow on hover */
+}
+
+/* Feedback message */
+.feedback-message {
+    margin-top: 15px; /* Reduced margin */
+    padding: 12px; /* Reduced padding */
+    border-radius: var(--radius);
+    background-color: #e6ffed; /* Very light green for success */
+    color: #1a5e20; /* Darker green for text */
+    border: 1px solid #d0f0d6; /* Subtle green border */
+    text-align: center;
+    display: none;
+    font-size: 0.9rem;
+}
+
+/* Responsiveness */
+@media (max-width: 600px) {
+    .form-container {
+        padding: 15px; /* Further reduced padding on small screens */
+        margin: 5px;
+    }
+    .form-container h2 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="file"],
+    .form-group textarea,
+    .form-group select {
+        width: calc(100% - 12px);
+        padding: 6px;
+        font-size: 0.875rem;
+    }
+    .form-group input[type="file"]::file-selector-button {
+        padding: 5px 8px;
+    }
+    .submit-button {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    .feedback-message {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+}

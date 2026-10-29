@@ -1,0 +1,47 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+Thumbs.db
+/backups/
+*.sql
+*.sql.gz
+
+# Media uploads
+/public/img/uploads/
+/public/video/uploads/
+/public/img/photo_profile/user_*
+
+# Local agent/codex temp files
+/.codex_tmp/
+/.codex_tmp_write_test.txt
+/todo.md
+
+# Local browser, agent and audit artifacts
+/.antigravitycli/
+/.backup/
+/.tmp-*/
+/screenshots/*.png
+/public/img/home-services-hero-v2.webp
+
+# Local production-access credentials
+/kconecta_codex_ed25519*

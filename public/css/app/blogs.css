@@ -1,0 +1,141 @@
+.container-main-all {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.6rem 1.4rem 2.6rem;
+}
+
+.container-all-blogs {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.property-listing-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(99, 196, 202, 0.18);
+    overflow: hidden;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.property-listing-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+}
+
+.image-gallery {
+    width: 100%;
+    padding: 0;
+    display: block;
+    position: relative;
+}
+
+.main-image-container {
+    position: relative;
+    width: 100%;
+    padding-top: 60%;
+    background-color: #e3eef0;
+    display: block;
+    overflow: hidden;
+}
+
+.main-image-container img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.property-details {
+    flex: 1;
+    padding: 1.2rem 1.3rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.property-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.property-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.property-title a:hover {
+    color: #0f6c74;
+}
+
+.property-description {
+    font-size: 0.95rem;
+    color: #3a4a5b;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.action-buttons-bottom {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+}
+
+.action-buttons-bottom .icon-btn {
+    background-color: rgba(99, 196, 202, 0.12);
+    border: 1px solid rgba(99, 196, 202, 0.35);
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 0.9rem;
+    color: #0f6c74;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.action-buttons-bottom .icon-btn:hover {
+    background-color: var(--color-main-1);
+    border-color: var(--color-main-1);
+    color: #ffffff;
+}
+
+.truncate-3-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 900px) {
+    .container-main-all {
+        padding: 1.2rem 1.1rem 2rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .container-all-blogs {
+        grid-template-columns: 1fr;
+    }
+    .property-listing-card {
+        border-radius: 16px;
+    }
+    .property-title {
+        font-size: 1.1rem;
+    }
+    .property-description {
+        font-size: 1rem;
+    }
+}

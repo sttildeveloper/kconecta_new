@@ -1,0 +1,743 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\CoverImage;
+use App\Models\MoreImage;
+use App\Models\Property;
+use App\Models\ProviderService;
+use App\Models\Service;
+use App\Models\ServiceAddress;
+use App\Models\ServiceProviderRating;
+use App\Models\ServiceType;
+use App\Models\ServiceWorkCode;
+use App\Models\User;
+use App\Models\UserAddress;
+use App\Models\UserLevel;
+use App\Models\Video;
+use App\Services\ProfilePhotoService;
+use App\Services\ProviderCsvImportService;
+use App\Services\ProviderServiceTypeService;
+use App\Support\PersonalProfileRules;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+
+class UserController extends Controller
+{
+    private const PROVIDER_IMPORT_SESSION_KEY = 'provider_import_preview';
+
+    private function userTypeLabels(): array
+    {
+        return [
+            1 => 'Administrador',
+            2 => 'Usuario Libre',
+            3 => 'Usuario Premium',
+            4 => 'Proveedor de servicio',
+            5 => 'Agente inmobiliario',
+        ];
+    }
+
+    private function userTypeGroups(): array
+    {
+        return [
+            'admin' => [1],
+            'service' => [4],
+            'owner' => [2, 3, 5],
+        ];
+    }
+
+    public function index()
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $isAdmin = (int) $user->user_level_id === 1;
+        if (! $isAdmin) {
+            return redirect()->route('dashboard');
+        }
+
+        $userLevelName = UserLevel::find($user->user_level_id)?->name ?? 'Usuario';
+        $request = request();
+        $filters = [
+            'q' => trim((string) $request->query('q', '')),
+            'level' => (string) $request->query('level', ''),
+            'ds' => (string) $request->query('ds', ''),
+            'de' => (string) $request->query('de', ''),
+        ];
+
+        $query = User::query();
+        if ($filters['q'] !== '') {
+            $search = $filters['q'];
+            $query->where(function ($builder) use ($search) {
+                $builder->where('first_name', 'like', '%'.$search.'%')
+                    ->orWhere('last_name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%')
+                    ->orWhere('user_name', 'like', '%'.$search.'%')
+                    ->orWhere('phone', 'like', '%'.$search.'%');
+            });
+        }
+
+        if ($filters['level'] !== '' && $filters['level'] !== 'all') {
+            $groups = $this->userTypeGroups();
+            if (isset($groups[$filters['level']])) {
+                $query->whereIn('user_level_id', $groups[$filters['level']]);
+            } elseif (is_numeric($filters['level'])) {
+                $query->where('user_level_id', (int) $filters['level']);
+            }
+        }
+
+        if ($filters['ds'] !== '') {
+            $query->whereDate('created_at', '>=', $filters['ds']);
+        }
+
+        if ($filters['de'] !== '') {
+            $query->whereDate('created_at', '<=', $filters['de']);
+        }
+
+        $users = $query->orderByDesc('id')->paginate(12)->withQueryString();
+        $userIds = $users->pluck('id')->map(fn ($id) => (int) $id)->all();
+        $addressRows = empty($userIds)
+            ? collect()
+            : UserAddress::whereIn('user_id', $userIds)->get()->groupBy('user_id');
+        $providerIds = $users->getCollection()
+            ->filter(fn (User $row) => (int) $row->user_level_id === User::LEVEL_SERVICE_PROVIDER)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+        $levelMap = UserLevel::pluck('name', 'id')->all();
+        $roleLabels = $this->userTypeLabels();
+        foreach ($roleLabels as $id => $label) {
+            $levelMap[$id] = $label;
+        }
+
+        $profileVisitsMap = [];
+        if (! empty($providerIds) && Schema::hasTable('service_profile_visits')) {
+            $profileVisitsMap = DB::table('service_profile_visits')
+                ->selectRaw('provider_user_id, COUNT(*) as total')
+                ->whereIn('provider_user_id', $providerIds)
+                ->groupBy('provider_user_id')
+                ->pluck('total', 'provider_user_id')
+                ->map(fn ($total) => (int) $total)
+                ->all();
+        }
+
+        $contactClicksMap = [];
+        if (! empty($providerIds) && Schema::hasTable('service_contact_clicks')) {
+            $contactClicksMap = DB::table('service_contact_clicks')
+                ->selectRaw('provider_user_id, COUNT(*) as total')
+                ->whereIn('provider_user_id', $providerIds)
+                ->groupBy('provider_user_id')
+                ->pluck('total', 'provider_user_id')
+                ->map(fn ($total) => (int) $total)
+                ->all();
+        }
+
+        $serviceTicketsMap = [];
+        if (! empty($providerIds)) {
+            $serviceTicketsMap = ServiceWorkCode::query()
+                ->selectRaw('provider_user_id, COUNT(*) as total')
+                ->whereIn('provider_user_id', $providerIds)
+                ->where('is_used', 1)
+                ->groupBy('provider_user_id')
+                ->pluck('total', 'provider_user_id')
+                ->map(fn ($total) => (int) $total)
+                ->all();
+        }
+
+        $ratingsSummaryMap = [];
+        if (! empty($providerIds)) {
+            $ratingsSummaryMap = ServiceProviderRating::query()
+                ->selectRaw('provider_user_id, COUNT(*) as total, AVG(stars) as average')
+                ->whereIn('provider_user_id', $providerIds)
+                ->groupBy('provider_user_id')
+                ->get()
+                ->mapWithKeys(function (ServiceProviderRating $rating) {
+                    return [
+                        (int) $rating->provider_user_id => [
+                            'total' => (int) ($rating->total ?? 0),
+                            'average' => round((float) ($rating->average ?? 0), 1),
+                        ],
+                    ];
+                })
+                ->all();
+        }
+
+        $users->getCollection()->transform(function (User $row) use ($addressRows, $levelMap, $profileVisitsMap, $contactClicksMap, $serviceTicketsMap, $ratingsSummaryMap) {
+            $address = $addressRows->get($row->id)?->first();
+            $name = trim(($row->first_name ?? '').' '.($row->last_name ?? ''));
+            if ($name === '') {
+                $name = $row->user_name ?: ($row->email ?: 'Usuario');
+            }
+
+            $isProvider = (int) $row->user_level_id === User::LEVEL_SERVICE_PROVIDER;
+
+            return [
+                'id' => $row->id,
+                'name' => $name,
+                'user_level_id' => (int) $row->user_level_id,
+                'user_name' => $row->user_name ?? '',
+                'email' => $row->email ?? '',
+                'phone' => $row->phone ?? '',
+                'landline_phone' => $row->landline_phone ?? '',
+                'level' => $levelMap[$row->user_level_id] ?? 'Usuario',
+                'is_active' => (int) ($row->is_active ?? 1),
+                'status_label' => (int) ($row->is_active ?? 1) === 1 ? 'Activo' : 'Desactivado',
+                'address' => $address?->address ?? ($row->address ?? ''),
+                'city' => $address?->city ?? '',
+                'province' => $address?->province ?? '',
+                'photo' => $row->photo ?? '',
+                'created_at' => $row->created_at ? $row->created_at->format('d/m/Y') : '',
+                'updated_at' => $row->updated_at ? $row->updated_at->format('d/m/Y') : '',
+                'provider_metrics' => $isProvider ? [
+                    'profile_visits' => $profileVisitsMap[(int) $row->id] ?? 0,
+                    'contact_clicks' => $contactClicksMap[(int) $row->id] ?? 0,
+                    'service_tickets' => $serviceTicketsMap[(int) $row->id] ?? 0,
+                    'ratings_received' => $ratingsSummaryMap[(int) $row->id]['total'] ?? 0,
+                    'ratings_average' => $ratingsSummaryMap[(int) $row->id]['average'] ?? 0,
+                ] : null,
+            ];
+        });
+
+        $levelOptions = UserLevel::orderBy('id')
+            ->get(['id', 'name'])
+            ->map(function (UserLevel $level) {
+                return (object) [
+                    'value' => $level->id,
+                    'name' => $level->name,
+                ];
+            });
+
+        return view('users.index', [
+            'user' => $user,
+            'userLevelName' => $userLevelName,
+            'isAdmin' => $isAdmin,
+            'activeNav' => 'users',
+            'users' => $users,
+            'filters' => $filters,
+            'levelOptions' => $levelOptions,
+            'providerImportPreview' => session(self::PROVIDER_IMPORT_SESSION_KEY),
+        ]);
+    }
+
+    public function previewProviderImport(Request $request, ProviderCsvImportService $providerCsvImportService): RedirectResponse
+    {
+        $this->ensureAdminUser($request);
+
+        $validated = $request->validate([
+            'providers_csv' => ['required', 'file', 'mimes:csv,txt', 'max:5120'],
+        ]);
+
+        $this->clearProviderImportPreview();
+
+        $uploadedFile = $validated['providers_csv'];
+        $storedPath = $uploadedFile->storeAs(
+            'provider-imports',
+            'preview_'.now()->format('Ymd_His').'_'.Str::random(12).'.csv',
+            'local'
+        );
+
+        $absolutePath = Storage::disk('local')->path($storedPath);
+        try {
+            $analysis = $providerCsvImportService->analyzeFile($absolutePath, false, true);
+        } catch (\Throwable $exception) {
+            Storage::disk('local')->delete($storedPath);
+
+            return redirect($this->usersIndexUrl([
+                'level' => (string) $request->input('level', User::LEVEL_SERVICE_PROVIDER),
+            ]))->with('error', 'No se pudo analizar el CSV: '.$exception->getMessage());
+        }
+
+        $preview = [
+            'storage_path' => $storedPath,
+            'original_name' => $uploadedFile->getClientOriginalName(),
+            'uploaded_at' => now()->format('d/m/Y H:i'),
+            'summary' => $analysis['summary'],
+            'report' => $analysis['report'],
+        ];
+
+        session([self::PROVIDER_IMPORT_SESSION_KEY => $preview]);
+
+        return redirect($this->usersIndexUrl([
+            'level' => (string) $request->input('level', User::LEVEL_SERVICE_PROVIDER),
+        ]))->with('status', 'CSV analizado. Revisa el resumen antes de proceder.');
+    }
+
+    public function commitProviderImport(Request $request, ProviderCsvImportService $providerCsvImportService): RedirectResponse
+    {
+        $this->ensureAdminUser($request);
+
+        $preview = session(self::PROVIDER_IMPORT_SESSION_KEY);
+        if (! is_array($preview) || empty($preview['storage_path'])) {
+            return redirect($this->usersIndexUrl())
+                ->with('error', 'No hay ninguna importacion pendiente de confirmacion.');
+        }
+
+        $disk = Storage::disk('local');
+        if (! $disk->exists($preview['storage_path'])) {
+            $request->session()->forget(self::PROVIDER_IMPORT_SESSION_KEY);
+
+            return redirect($this->usersIndexUrl())
+                ->with('error', 'El archivo temporal ya no esta disponible. Sube el CSV de nuevo.');
+        }
+
+        if (! empty($preview['summary']['blocked']) || (int) ($preview['summary']['missing_coordinates'] ?? 0) > 0) {
+            return redirect($this->usersIndexUrl([
+                'level' => (string) User::LEVEL_SERVICE_PROVIDER,
+            ]))->with('error', 'No se puede proceder con la importacion mientras el CSV tenga proveedores sin coordenadas. Sanea el archivo y vuelve a subirlo.');
+        }
+
+        $absolutePath = $disk->path($preview['storage_path']);
+        try {
+            $analysis = $providerCsvImportService->analyzeFile($absolutePath, true, true);
+        } catch (\Throwable $exception) {
+            return redirect($this->usersIndexUrl())
+                ->with('error', 'No se pudo completar la importacion: '.$exception->getMessage());
+        }
+
+        $disk->delete($preview['storage_path']);
+        $request->session()->forget(self::PROVIDER_IMPORT_SESSION_KEY);
+
+        $summary = $analysis['summary'];
+        $message = sprintf(
+            'Importacion completada. Nuevos: %d. Actualizados: %d. Saltados: %d. Conflictos: %d. Errores: %d.',
+            $summary['created'],
+            $summary['updated'],
+            $summary['skipped'],
+            $summary['conflicts'],
+            $summary['errors']
+        );
+
+        return redirect($this->usersIndexUrl())->with('status', $message);
+    }
+
+    public function cancelProviderImport(Request $request): RedirectResponse
+    {
+        $this->ensureAdminUser($request);
+        $this->clearProviderImportPreview();
+
+        return redirect($this->usersIndexUrl())
+            ->with('status', 'Importacion cancelada. No se realizaron cambios.');
+    }
+
+    public function userView(string $id)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $isAdmin = (int) $user->user_level_id === 1;
+        if (! $isAdmin) {
+            return redirect()->route('dashboard');
+        }
+
+        $profileUser = User::findOrFail($id);
+        $address = UserAddress::where('user_id', $profileUser->id)->first();
+        $roleLabels = $this->userTypeLabels();
+        $levelName = $roleLabels[$profileUser->user_level_id]
+            ?? (UserLevel::find($profileUser->user_level_id)?->name ?? 'Usuario');
+        $propertyCount = Property::where('user_id', $profileUser->id)->count();
+        $serviceIds = Service::where('user_id', $profileUser->id)->pluck('id')->all();
+        $serviceCount = count($serviceIds);
+        $serviceTypeIds = app(ProviderServiceTypeService::class)->typeIdsForProvider((int) $profileUser->id);
+        $serviceTypeNames = empty($serviceTypeIds)
+            ? []
+            : ServiceType::whereIn('id', $serviceTypeIds)
+                ->orderBy('name')
+                ->pluck('name')
+                ->filter()
+                ->values()
+                ->all();
+        $serviceTypeCount = count($serviceTypeNames);
+
+        return view('users.view', [
+            'user' => $user,
+            'userLevelName' => $roleLabels[$user->user_level_id]
+                ?? (UserLevel::find($user->user_level_id)?->name ?? 'Usuario'),
+            'isAdmin' => $isAdmin,
+            'activeNav' => 'users',
+            'profileUser' => $profileUser,
+            'address' => $address,
+            'levelName' => $levelName,
+            'propertyCount' => $propertyCount,
+            'serviceCount' => $serviceCount,
+            'serviceTypeCount' => $serviceTypeCount,
+            'serviceTypeNames' => $serviceTypeNames,
+            'isActive' => (int) ($profileUser->is_active ?? 1) === 1,
+        ]);
+    }
+
+    public function update()
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $address = UserAddress::where('user_id', $user->id)->first();
+        $documentTypes = ['DNI', 'NIE', 'CIF', 'Pasaporte'];
+        $addressValidated = $address && $address->latitude && $address->longitude;
+
+        $addressRequired = ! in_array((int) $user->user_level_id, [
+            User::LEVEL_SERVICE_PROVIDER,
+            User::LEVEL_FINAL_CLIENT,
+        ], true);
+
+        return view('user.update', [
+            'user' => $user,
+            'address' => $address,
+            'documentTypes' => $documentTypes,
+            'addressRequired' => $addressRequired,
+            'activeNav' => 'profile',
+            'isAdmin' => (int) $user->user_level_id === 1,
+            'mapsKey' => config('services.google.maps_key'),
+            'addressValidated' => $addressValidated,
+            'pageTitle' => 'Kconecta - Mi perfil',
+            'pageHeading' => 'Mi perfil',
+            'pageSubheading' => 'Actualiza tus datos personales',
+        ]);
+    }
+
+    public function editAdmin(string $id)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $isAdmin = (int) $user->user_level_id === 1;
+        if (! $isAdmin) {
+            return redirect()->route('dashboard');
+        }
+
+        $profileUser = User::findOrFail($id);
+        $address = UserAddress::where('user_id', $profileUser->id)->first();
+        $documentTypes = ['DNI', 'NIE', 'CIF', 'Pasaporte'];
+        $addressValidated = $address && $address->latitude && $address->longitude;
+
+        $addressRequired = ! in_array((int) $profileUser->user_level_id, [
+            User::LEVEL_SERVICE_PROVIDER,
+            User::LEVEL_FINAL_CLIENT,
+        ], true);
+
+        return view('user.update', [
+            'user' => $profileUser,
+            'address' => $address,
+            'documentTypes' => $documentTypes,
+            'addressRequired' => $addressRequired,
+            'activeNav' => 'users',
+            'isAdmin' => $isAdmin,
+            'mapsKey' => config('services.google.maps_key'),
+            'addressValidated' => $addressValidated,
+            'pageTitle' => 'Kconecta - Editar usuario',
+            'pageHeading' => 'Editar usuario',
+            'pageSubheading' => 'Actualiza la informacion del usuario',
+            'targetUserId' => $profileUser->id,
+        ]);
+    }
+
+    public function updateSave(Request $request)
+    {
+        $authUser = $request->user();
+        if (! $authUser) {
+            return redirect()->route('login');
+        }
+
+        $isAdmin = (int) $authUser->user_level_id === 1;
+        $targetUserId = (int) $request->input('target_user_id', 0);
+        if ($targetUserId && ! $isAdmin) {
+            abort(403);
+        }
+
+        $user = $authUser;
+        if ($targetUserId && $targetUserId !== (int) $authUser->id) {
+            $user = User::findOrFail($targetUserId);
+        }
+
+        $validated = $request->validate(array_merge(PersonalProfileRules::forUpdate($user), [
+            'address_place_id' => ['nullable', 'string', 'max:255'],
+            'address_street_name' => ['nullable', 'string', 'max:255'],
+            'address_street_number' => ['nullable', 'string', 'max:50'],
+            'address_neighborhood' => ['nullable', 'string', 'max:255'],
+            'address_city' => ['nullable', 'string', 'max:255'],
+            'address_province' => ['nullable', 'string', 'max:255'],
+            'address_state' => ['nullable', 'string', 'max:255'],
+            'address_postal_code' => ['nullable', 'string', 'max:20'],
+            'address_country' => ['nullable', 'string', 'max:255'],
+            'address_lat' => ['nullable', 'numeric'],
+            'address_lng' => ['nullable', 'numeric'],
+        ]));
+
+        $addressRecord = UserAddress::firstOrNew(['user_id' => $user->id]);
+        $addressInput = trim((string) ($validated['address'] ?? ''));
+        $placeId = trim((string) ($validated['address_place_id'] ?? ''));
+        $currentAddress = trim((string) ($addressRecord->address ?? $user->address ?? ''));
+        $addressRequired = ! in_array((int) $user->user_level_id, [
+            User::LEVEL_SERVICE_PROVIDER,
+            User::LEVEL_FINAL_CLIENT,
+        ], true);
+
+        if ($addressRequired && $addressInput !== '' && $addressInput !== $currentAddress && $placeId === '') {
+            return back()
+                ->withErrors(['address' => 'Selecciona una direccion sugerida por Google.'])
+                ->withInput();
+        }
+
+        $user->first_name = $validated['first_name'];
+        $user->last_name = $validated['last_name'] ?? '';
+        $user->email = $validated['email'];
+        $user->phone = $validated['phone'] ?? '';
+        $user->landline_phone = $validated['landline_phone'] ?? '';
+        $user->document_type = $validated['document_type'] ?? '';
+        $user->document_number = $validated['document_number'] ?? '';
+
+        $user->address = $addressInput !== '' ? $addressInput : null;
+
+        if (! empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $photoUpdated = false;
+        if ($request->hasFile('photo')) {
+            try {
+                $file = $request->file('photo');
+                $filename = app(ProfilePhotoService::class)->store($file, (int) $user->id);
+                $user->photo = $filename;
+                $photoUpdated = true;
+            } catch (\Throwable $exception) {
+                report($exception);
+
+                throw ValidationException::withMessages([
+                    'photo' => 'No se pudo procesar el logo en este momento. Verifica que sea una imagen JPG, PNG o WEBP e intentalo de nuevo.',
+                ]);
+            }
+        }
+
+        $user->save();
+
+        $addressChanged = $addressInput !== $currentAddress;
+        $addressRecord->address = $addressInput !== '' ? $addressInput : null;
+
+        // Keep previously validated coordinates for providers when address wasn't changed
+        // and no new Google place was selected in this submit.
+        $keepExistingGeoData = ! $addressRequired
+            && $placeId === ''
+            && ! $addressChanged
+            && $addressRecord->exists;
+
+        if (! $keepExistingGeoData) {
+            $addressRecord->street_name = $placeId !== '' ? ($validated['address_street_name'] ?? null) : null;
+            $addressRecord->street_number = $placeId !== '' ? ($validated['address_street_number'] ?? null) : null;
+            $addressRecord->neighborhood = $placeId !== '' ? ($validated['address_neighborhood'] ?? null) : null;
+            $addressRecord->city = $placeId !== '' ? ($validated['address_city'] ?? null) : null;
+            $addressRecord->province = $placeId !== '' ? ($validated['address_province'] ?? null) : null;
+            $addressRecord->state = $placeId !== '' ? ($validated['address_state'] ?? null) : null;
+            $addressRecord->postal_code = $placeId !== '' ? ($validated['address_postal_code'] ?? null) : null;
+            $addressRecord->country = $placeId !== '' ? ($validated['address_country'] ?? null) : null;
+            $addressRecord->latitude = $placeId !== '' ? ($validated['address_lat'] ?? null) : null;
+            $addressRecord->longitude = $placeId !== '' ? ($validated['address_lng'] ?? null) : null;
+        }
+
+        $hasAddressData = $addressRecord->address !== null
+            || $addressRecord->latitude !== null
+            || $addressRecord->longitude !== null;
+
+        if ($hasAddressData) {
+            $addressRecord->user_id = $user->id;
+            $addressRecord->save();
+        } elseif ($addressRecord->exists) {
+            $addressRecord->delete();
+        }
+
+        $statusMessage = 'Perfil actualizado correctamente.';
+        if ($photoUpdated) {
+            $statusMessage .= ' Foto actualizada en formato WebP (350x350).';
+        }
+
+        return redirect()
+            ->back()
+            ->with('status', $statusMessage);
+    }
+
+    public function toggleStatus(Request $request)
+    {
+        $authUser = Auth::user();
+        if (! $authUser) {
+            return response()->json(['status' => 401], 401);
+        }
+
+        $isAdmin = (int) $authUser->user_level_id === 1;
+        if (! $isAdmin) {
+            return response()->json(['status' => 403], 403);
+        }
+
+        $id = (int) $request->query('id');
+        if (! $id) {
+            return response()->json(['status' => 400], 400);
+        }
+
+        if ($id === (int) $authUser->id) {
+            return response()->json(['status' => 409, 'message' => 'No puedes desactivar tu usuario.'], 409);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            return response()->json(['status' => 404], 404);
+        }
+
+        $user->is_active = (int) ($user->is_active ?? 1) === 1 ? 0 : 1;
+        $user->save();
+
+        return response()->json([
+            'status' => 200,
+            'is_active' => (int) $user->is_active,
+        ]);
+    }
+
+    public function userDelete(Request $request)
+    {
+        $authUser = Auth::user();
+        if (! $authUser) {
+            return response()->json(['status' => 401], 401);
+        }
+
+        $isAdmin = (int) $authUser->user_level_id === 1;
+        if (! $isAdmin) {
+            return response()->json(['status' => 403], 403);
+        }
+
+        $id = (int) $request->query('id');
+        if (! $id) {
+            return response()->json(['status' => 400], 400);
+        }
+
+        if ($id === (int) $authUser->id) {
+            return response()->json(['status' => 409, 'message' => 'No puedes eliminar tu usuario.'], 409);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            return response()->json(['status' => 404], 404);
+        }
+
+        if ((int) $user->user_level_id !== 4) {
+            return response()->json(['status' => 403, 'message' => 'Solo puedes eliminar proveedores de servicio.'], 403);
+        }
+
+        DB::transaction(function () use ($user): void {
+            $serviceIds = Service::where('user_id', $user->id)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            if (Schema::hasTable('service_profile_visits')) {
+                $profileVisitsQuery = DB::table('service_profile_visits')
+                    ->where('provider_user_id', (int) $user->id);
+
+                if (! empty($serviceIds)) {
+                    $profileVisitsQuery->orWhereIn('service_id', $serviceIds);
+                }
+
+                $profileVisitsQuery->delete();
+            }
+
+            if (Schema::hasTable('service_contact_clicks')) {
+                $contactClicksQuery = DB::table('service_contact_clicks')
+                    ->where('provider_user_id', (int) $user->id);
+
+                if (! empty($serviceIds)) {
+                    $contactClicksQuery->orWhereIn('service_id', $serviceIds);
+                }
+
+                $contactClicksQuery->delete();
+            }
+
+            if (Schema::hasColumn('cover_image', 'provider_user_id')) {
+                CoverImage::where('provider_user_id', (int) $user->id)->delete();
+            }
+            if (Schema::hasColumn('more_images', 'provider_user_id')) {
+                MoreImage::where('provider_user_id', (int) $user->id)->delete();
+            }
+            if (Schema::hasColumn('video', 'provider_user_id')) {
+                Video::where('provider_user_id', (int) $user->id)->delete();
+            }
+            ProviderService::where('provider_id', (int) $user->id)->delete();
+
+            if (! empty($serviceIds)) {
+                CoverImage::whereIn('service_id', $serviceIds)->delete();
+                MoreImage::whereIn('service_id', $serviceIds)->delete();
+                Video::whereIn('service_id', $serviceIds)->delete();
+                ServiceAddress::whereIn('service_id', $serviceIds)->delete();
+                Service::whereIn('id', $serviceIds)->delete();
+            }
+
+            ServiceProviderRating::where('provider_user_id', (int) $user->id)->delete();
+
+            ServiceWorkCode::where('provider_user_id', (int) $user->id)
+                ->orWhere('used_by_user_id', (int) $user->id)
+                ->delete();
+
+            if (Schema::hasTable('account_deletion_audits')) {
+                DB::table('account_deletion_audits')
+                    ->where('user_id', (int) $user->id)
+                    ->delete();
+            }
+
+            if (Schema::hasTable('personal_access_tokens')) {
+                DB::table('personal_access_tokens')
+                    ->where('tokenable_type', User::class)
+                    ->where('tokenable_id', (int) $user->id)
+                    ->delete();
+            }
+
+            UserAddress::where('user_id', $user->id)->delete();
+            $user->delete();
+        });
+
+        return response()->json(['status' => 200]);
+    }
+
+    private function ensureAdminUser(Request $request): User
+    {
+        $user = $request->user();
+        if (! $user) {
+            abort(401);
+        }
+
+        if ((int) $user->user_level_id !== User::LEVEL_ADMIN) {
+            abort(403);
+        }
+
+        return $user;
+    }
+
+    private function usersIndexUrl(array $query = []): string
+    {
+        $query = array_filter($query, fn ($value) => $value !== null && $value !== '');
+        if (empty($query)) {
+            $query = ['level' => User::LEVEL_SERVICE_PROVIDER];
+        }
+
+        return url('/users').'?'.http_build_query($query);
+    }
+
+    private function clearProviderImportPreview(): void
+    {
+        $preview = session(self::PROVIDER_IMPORT_SESSION_KEY);
+        if (is_array($preview) && ! empty($preview['storage_path'])) {
+            Storage::disk('local')->delete($preview['storage_path']);
+        }
+
+        session()->forget(self::PROVIDER_IMPORT_SESSION_KEY);
+    }
+}

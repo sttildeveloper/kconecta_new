@@ -1,0 +1,44 @@
+/* From Uiverse.io by mobinkakei */ 
+.checkmark-checkbox-input-ui {
+    display: block;
+    width: 1.4rem;
+    height: 1.4rem;
+    background-color: #ddd;
+    border-radius: 4px;
+    position: relative;
+    transition: background-color 0.4s;
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.checkbox-input-ui:checked ~ .checkmark-checkbox-input-ui {
+    background-color: var(--color-main-1);
+}
+
+.checkmark-checkbox-input-ui::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 10px;
+    border-right: 3px solid #fff;
+    border-bottom: 3px solid #fff;
+    top: 44%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateZ(40deg) scale(10);
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.checkbox-input-ui:checked ~ .checkmark-checkbox-input-ui::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotateZ(40deg) scale(1);
+}
+/* 
+
+<label class="">
+    <input checked="" type="checkbox" class="checkbox-input-ui" hidden="">
+    <label class="checkmark-checkbox-input-ui"></label>
+</label>
+
+*/

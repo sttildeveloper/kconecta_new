@@ -1,0 +1,74 @@
+
+/* From Uiverse.io by zAcherttp */ 
+.container-input-radio-ui input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.container-input-radio-ui {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+    /* background-color: black; */
+}
+
+.container-input-radio-ui .checkmark {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 1.1em;
+    width: 1.1em;
+    background-color: #ccc;
+    border-radius: 50%;
+    transition: 0.1s ease-out;
+    box-shadow:
+        inset 0.07em 0.07em 0.12em #b3b3b3,
+        inset -0.07em -0.07em 0.12em #ffffff;
+}
+
+.container-input-radio-ui input:checked ~ .checkmark {
+    box-shadow:
+        inset -0.07em -0.07em 0.12em #c1b8ff,
+        inset 0.07em 0.07em 0.12em #a99ef9,
+        0.1em 0.1em 0.2em -0.05em #7a7a7a;
+    background-color: var(--color-main-1);
+}
+
+.container-input-radio-ui .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    transition: transform 0.1s ease-in-out;
+    transform-origin: center;
+}
+
+.container-input-radio-ui input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.container-input-radio-ui .checkmark:after {
+    left: 0.4em;
+    top: 0.28em;
+    width: 0.3em;
+    height: 0.5em;
+    border: solid white;
+    border-width: 0 0.15em 0.15em 0;
+    transform: rotate(45deg);
+}
+
+/* 
+  
+
+<label class="container-input-radio-ui">
+  <input type="radio" checked="checked" />
+  <div class="checkmark"></div>
+</label>
+
+aqui texto otro label
+
+*/

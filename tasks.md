@@ -1,0 +1,1172 @@
+# Kconecta CRM - Tasks
+
+## Refactor ficha única del proveedor (2026-08-02)
+
+- [x] Añadir `provider_user_id` a portada, galería y vídeo.
+- [x] Migrar multimedia legacy de proveedores sin afectar propiedades.
+- [x] Persistir título, descripción, disponibilidad y web en `user`.
+- [x] Usar `user_address` y `provider_services` como fuentes canónicas.
+- [x] Incorporar rutas canónicas web y API para la ficha.
+- [x] Impedir nuevas publicaciones y borrados desde el CRUD legacy.
+- [x] Cambiar métricas nuevas para no guardar `service_id`.
+- [x] Añadir trazabilidad para distinguir multimedia genérica y real.
+- [x] Implementar comando idempotente `providers:backfill-default-media`.
+- [x] Crear backup local previo al backfill y verificar SHA-256.
+- [x] Completar en local 2.900 portadas y 14.505 imágenes de galería genéricas.
+- [x] Verificar 2.903/2.903 proveedores con portada y galería.
+- [x] Validar suite completa local: 138 tests, 1.292 assertions.
+- [ ] Ejecutar backup productivo de BD y multimedia.
+- [ ] Aplicar migraciones y QA controlado en producción.
+- [ ] Confirmar compatibilidad de la app móvil con `/api/agent/provider-profile`.
+- [ ] Retirar aliases, columnas y tablas legacy en una fase separada.
+
+## Plan historico (2026-07-31) - Refactor del home público
+- [x] Alcance funcional y técnico documentado en `HOME_REFACTOR_PLAN.md`.
+- [x] Recursos `hero-bg.webp` e `img-review-1.webp` a `img-review-3.webp` migrados a `public/img`.
+- [x] Incorporar los tres artículos publicados más recientes en `PageController@index`.
+- [x] Refactorizar estructura, layout y navegación del home según el diseño aprobado.
+- [x] Integrar hero, reseñas y grilla dinámica de consejos.
+- [x] Preservar búsqueda pública sin registro y geolocalización bajo acción explícita.
+- [x] Preservar registro de proveedor sin dirección y acceso al perfil solo después de verificar el correo.
+- [x] Ampliar pruebas de home, blog, registro y ubicación.
+- [x] Ejecutar QA local en escritorio y móvil.
+- [x] Presentar capturas locales para revisión JM/Gala.
+- [x] Autorizacion expresa recibida; commit, push y despliegue completados.
+
+## Regla Canonica - Proveedor de Servicios
+- El `Proveedor de servicios` no publica servicios individuales.
+- El alcance funcional vigente del proveedor es:
+- registro validado,
+- acceso al CRM,
+- mantenimiento de ficha publica,
+- logo/foto,
+- direccion,
+- tipos de servicio que ofrece,
+- galeria,
+- video,
+- y valoraciones/metricas.
+- Las tareas legacy que mencionan `/post/services`, `createService()` o CRUD de servicios de proveedor deben reinterpretarse como deuda de transicion hacia la `ficha de proveedor`.
+
+## Session Update (2026-07-08) - Refactor tipos de servicio del proveedor
+- [x] Modelo canonico proveedor ↔ tipos de servicio consolidado localmente.
+- [x] Tabla pivote oficial creada:
+- [x] `provider_services` (`provider_id`, `service_type_id`, timestamps).
+- [x] Catalogo admin preservado en:
+- [x] `service_type`.
+- [x] Tabla legacy relacional retirada del flujo proveedor:
+- [x] `service_types`.
+- [x] Backfill local seguro ejecutado antes de retirar la tabla legacy.
+- [x] Lectura y guardado de especialidades del proveedor movidos a `provider_services`.
+- [x] Vistas y payloads internos alineados a nomenclatura canonica:
+- [x] `specialties`
+- [x] `specialty_ids`
+- [x] Compatibilidad transitoria preservada en respuestas API seleccionadas:
+- [x] `service_types`
+- [x] `service_type_ids`
+- [x] Regresion objetivo validada:
+- [x] `ProviderServicesApiTest`
+- [x] `PublicDiscoveryApiTest`
+- [x] `ServiceTypeManagementTest`
+- [x] `ProviderSingleServiceProfileTest`
+- [x] `AdminProviderDeletionTest`
+- [x] Resultado de la pasada dirigida:
+- [x] `38` tests, `341` assertions.
+
+## Mobile API Registration Release (2026-06-28)
+- [x] Implementados endpoints nativos de registro para la app móvil bajo `/api/mobile/`:
+  - [x] `POST /api/mobile/register-provider` (`user_level_id = 4`)
+  - [x] `POST /api/mobile/register-client` (`user_level_id = 6`)
+- [x] Creado `App\Services\UserRegistrationService` para reutilizar las reglas de validación y creación del registro web.
+- [x] Creado `App\Http\Controllers\Api\RegisterApiController` devuelviendo tokens Sanctum y estructura JSON normalizada.
+- [x] Refactorizado `RegisteredUserController` sin alterar el comportamiento web.
+
+## Sprint Execution Mode (2026-06-04)
+- [x] Decision tomada:
+- [x] implementar el backlog tecnico-funcional siguiendo el plan por sprints.
+- [x] Documento maestro de ejecucion:
+- [x] `kconecta_backlog_roadmap.md`
+- [ ] Siguiente paso operativo:
+- [ ] desglosar Sprint 1 en tareas ejecutables del repo actual.
+- [ ] validar alcance inicial de `Tickets e Incidencias` frente a la baseline ya desplegada.
+- [ ] identificar dependencias tecnicas reutilizables del sistema actual para minimizar riesgo de integracion.
+
+## Session Closure (2026-06-07) - Pause sprint escalation / switch to Apple release
+- [x] Sprint 1 `Tickets e Incidencias` ejecutado parcialmente en local.
+- [x] Commit local creado sin push:
+- [x] `f24313d` - `feat(tickets): add sprint 1 support module`
+- [x] Validacion local tickets:
+- [x] `docker compose exec app php artisan test --filter=TicketTest` -> PASS (`7` tests, `37` assertions)
+- [x] Estado deliberado:
+- [x] no hacer `push` todavia para evitar autodeploy a produccion
+- [x] Flujo local de migraciones legacy reconciliado para:
+- [x] `2026_05_22_160000_create_account_deletion_audits_table`
+- [x] `2026_06_04_000000_create_tickets_and_messages_tables`
+- [x] Revisada la UX del detalle publico de propiedades y corregido localmente el overflow de cards/textos largos.
+- [x] Revisado el bloque de formularios de propiedades con estrategia por tipo.
+- [x] `Casa o chalet` completado en primera pasada local:
+- [x] resumen de errores en frontend
+- [x] bloqueo de guardado si faltan obligatorios clave
+- [x] validacion backend especifica para tipo `1`
+- [ ] Pendiente cuando se retome esta linea:
+- [ ] prueba manual funcional de `Casa o chalet` autenticado en navegador local
+- [ ] ajustar hallazgos UX/validacion de esa prueba
+- [ ] replicar el mismo enfoque por tipo:
+- [ ] `Piso`
+- [ ] `Local o nave`
+- [ ] `Garaje`
+- [ ] `Terreno`
+- [ ] `Casa rustica`
+- [x] Cambio de prioridad acordado:
+- [x] pausa temporal del trabajo de sprints/backend web
+- [x] siguiente frente principal: preparar la app de ficha de proveedor para subida al **Apple App Store**
+
+## Nueva prioridad release iOS (2026-06-07) - App de proveedores a Apple App Store
+- [ ] Auditar estado actual de la app de proveedores para envio a App Store Connect.
+- [ ] Confirmar build actual, bundle identifier, version y build number.
+- [ ] Revisar requisitos Apple pendientes:
+- [ ] metadatos App Store
+- [ ] screenshots
+- [ ] privacy nutrition
+- [ ] privacy policy URL
+- [ ] account deletion UX/link si aplica
+- [ ] credenciales/demo flow para review
+- [ ] Comprobar integracion real contra backend Kconecta ya desplegado.
+- [ ] Ejecutar checklist tecnico de release iOS:
+- [ ] login
+- [ ] perfil proveedor
+- [ ] logo proveedor
+- [ ] ficha publica del proveedor
+- [ ] metricas/ratings si forman parte del alcance del build
+- [ ] Preparar plan de subida sin afectar produccion web hasta validar build final.
+
+## Nueva tarea UX Registro (2026-05-12) - Reducir friccion en alta
+- [ ] Objetivo:
+- [ ] simplificar formulario de registro para aumentar conversion y reducir intimidacion del usuario.
+- [ ] Reglas funcionales solicitadas:
+- [ ] mantener obligatorios solo:
+- [ ] `email`
+- [ ] `password` + `password_confirmation`
+- [ ] mantener validacion de identidad minima:
+- [ ] `first_name` y/o `company_name` (al menos uno obligatorio).
+- [ ] marcar explicitamente como `Opcional` todos los campos no obligatorios visibles en UI.
+- [ ] eliminar del formulario de registro los campos de direccion:
+- [ ] `address`
+- [ ] `address_floor`
+- [ ] `address_door`
+- [ ] y metadatos asociados (`place_id`, ciudad, provincia, cp, lat, lng, etc.).
+- [ ] Persistencia/compatibilidad:
+- [ ] todo campo ocultado/eliminado del formulario debe guardarse como `null` en backend para no romper flujos existentes.
+- [ ] Alcance tecnico:
+- [ ] actualizar vista `resources/views/auth/auth.blade.php` (labels, visibilidad, required).
+- [ ] actualizar validaciones en `app/Http/Controllers/Auth/RegisteredUserController.php`.
+- [ ] asegurar que la creacion de `user` y `user_address` persista `null` cuando no haya datos.
+- [ ] QA esperado:
+- [ ] alta `Cliente final` con solo nombre/razon social + email + password.
+- [ ] alta `Proveedor` y `Agente` sin bloqueo por campos marcados como opcionales (salvo reglas explicitamente obligatorias vigentes).
+- [ ] no errores por campos de direccion ausentes.
+
+## Session Update (2026-05-12) - Deploy ratings/client-final en produccion
+- [x] Verificado estado Git local/remoto: `main` alineado con `origin/main` en `07c3aae`.
+- [x] Backup pre-release ejecutado en VPS y validado:
+- [x] `/root/kconecta_backups/*_pre_ratings_release/db_production.sql.gz`
+- [x] Push a `origin/main` completado para los commits del bloque ratings + fixes asociados.
+- [x] Redeploy manual en Dokploy ejecutado (autodeploy no refresco contenedor app en primer intento).
+- [x] Migraciones en produccion revisadas:
+- [x] `php artisan migrate --force` -> `Nothing to migrate`.
+- [x] Limpieza de cache aplicada:
+- [x] `php artisan optimize:clear`.
+- [x] Smoke checks productivos validados:
+- [x] `https://kconecta.com/` -> `200`
+- [x] `https://kconecta.com/register` -> `200`
+- [x] `https://kconecta.com/post/services` -> `302` a `/login` (esperado)
+- [x] Verificacion de artefactos del refactor de detalle en produccion:
+- [x] presentes `more_data.blade.php` y `share_login_modal.blade.php`.
+- [x] Hallazgo operativo en produccion:
+- [x] faltaba `user_level.id=6` (`Cliente final`) en catalogo DB.
+- [x] Fix aplicado con `updateOrInsert` en produccion.
+- [x] Resultado: selector de registro online ahora muestra `Cliente final`.
+- [ ] Pendiente inmediato:
+- [ ] QA online funcional completo del flujo: registro cliente final -> verificacion email -> valoracion a proveedor con codigo.
+
+## Session Update (2026-05-07) - Mapa servicios + refactor detalles (local)
+- [x] Corregido `GET /logout` web para evitar `419` en flujo de cierre de sesion por navegacion directa.
+- [x] Corregido endpoint `dataServicesForMap` para resolver ubicacion desde `service_address` o fallback `user_address`.
+- [x] Ajustado CTA en `result_all_service` a etiqueta generica `Buscar`.
+- [x] Corregida persistencia de direccion de proveedor en perfil:
+- [x] ya no se limpian `lat/lng` existentes cuando la direccion no cambia y no se selecciona nuevo place.
+- [x] Refactor separado de `details.blade.php` a parciales:
+- [x] `resources/views/page/partials/details/more_data.blade.php`
+- [x] `resources/views/page/partials/details/share_login_modal.blade.php`
+- [x] Commits locales creados:
+- [x] `0c95828` - `Fix services map search and preserve provider geolocation`
+- [x] `07c3aae` - `Refactor property details view into partials`
+- [ ] Pendiente inmediato:
+- [ ] smoke QA local post-refactor de detalle publico (`/result/{reference}`) antes de cualquier push.
+
+## Session Update (2026-05-06) - Valoraciones proveedor (implementacion + QA local)
+- [x] Esquema de datos implementado:
+- [x] tabla `service_provider_ratings` creada en local
+- [x] tabla `service_work_codes` creada en local
+- [x] migracion de `user_level` para `Cliente final` (id `6`) agregada
+- [x] Nota operativa local: por esquema legacy de `migrations`, se requirio registro/ajuste manual para completar consistencia.
+- [x] Backend/API implementado:
+- [x] generacion de codigo de trabajo (proveedor)
+- [x] envio de valoracion por cliente final verificado con `work_code`
+- [x] resumen por proveedor (`average_stars`, `ratings_count`, `my_stars`)
+- [x] consumo atomico de codigo + update/create de valoracion en transaccion
+- [x] Registro actualizado para nuevo perfil `Cliente final`:
+- [x] disponible en selector de tipo de usuario
+- [x] verificacion por email habilitada para este perfil
+- [x] reglas refinadas (peticion de hoy):
+- [x] `Nombre` o `Razon social` obligatorios (al menos uno)
+- [x] `Apellido` opcional
+- [x] `Movil (WhatsApp)` opcional para `Cliente final`
+- [x] `Movil (WhatsApp)` obligatorio para `Proveedor` y `Agente`
+- [x] `Telefono fijo` opcional
+- [x] `Direccion` opcional
+- [x] UI implementada:
+- [x] `details_service` con bloque de rating (promedio, votos, estrellas)
+- [x] formulario de valoracion visible para cliente final verificado
+- [x] `/post/services` (vista proveedor) con seccion `Codigos de trabajo` (generar + copiar)
+- [x] dashboard de `Cliente final` refinado:
+- [x] vista orientada a valoraciones (sin metricas inmobiliarias de propiedad)
+- [x] card `Realizar valoracion` con `codigo de trabajo` + `calidad del servicio` (estrellas clicables) + `Guardar`
+- [x] input de codigo con icono tipo ticket y layout visual adaptado a referencia UX
+- [x] ajuste de rutas para sesion web:
+- [x] endpoints web `/service-ratings/*` para evitar `Unauthenticated` en backoffice
+- [x] payload UI corregido para leer `data` anidado en respuestas API
+- [x] QA local ejecutado:
+- [x] `php artisan test --filter=ServiceRatingsApiTest` -> PASS (4 tests, 19 assertions)
+- [x] `php artisan test --filter=RegistrationTest` -> PASS (2 tests, 4 assertions)
+
+## Session Update (2026-05-05) - Plan Valoraciones con Estrellas (Proveedor)
+- [ ] Implementar valoraciones de estrellas (1-5 enteras) para proveedores con elegibilidad por codigo de trabajo.
+- [ ] Crear perfil `Cliente final` en `user_level`, habilitado para registro local con verificacion por email.
+- [ ] Crear tabla `service_provider_ratings`:
+- [ ] campos: `provider_user_id`, `client_user_id`, `stars`, timestamps
+- [ ] `unique(provider_user_id, client_user_id)`
+- [ ] indices en `provider_user_id` y `client_user_id`
+- [ ] regla: `stars` entre 1 y 5
+- [ ] regla: no auto-valoracion (`client_user_id != provider_user_id`)
+- [ ] Crear tabla `service_work_codes`:
+- [ ] campos: `provider_user_id`, `code`, `is_used`, `used_by_user_id`, `used_at`, timestamps
+- [ ] indice en `provider_user_id`
+- [ ] Endpoints API:
+- [ ] `POST /api/service-ratings/work-codes` (proveedor autenticado) -> generar codigo
+- [ ] `POST /api/service-ratings` (cliente final autenticado/verificado) -> `{ provider_user_id, work_code, stars }`
+- [ ] `GET /api/service-ratings/provider/{provider_user_id}` -> `{ average_stars, ratings_count, my_stars? }`
+- [ ] Reglas de flujo:
+- [ ] validar codigo existente, del proveedor correcto y no usado
+- [ ] marcar codigo como usado por cliente (`used_by_user_id`, `used_at`)
+- [ ] crear/actualizar valoracion (1 por cliente/proveedor, editable)
+- [ ] UI:
+- [ ] `details_service`: mostrar promedio, total de votos y estrellas visuales
+- [ ] cliente final verificado: mostrar formulario de estrellas + codigo de trabajo
+- [ ] backoffice proveedor: seccion para generar/copiar codigos de trabajo
+- [ ] sin comentarios de texto en vistas ni API
+- [ ] Errores API claros: no verificado, codigo invalido/usado, stars fuera de rango, rol no permitido.
+- [ ] Plan de pruebas:
+- [ ] unitarias: rango stars, unicidad, no auto-valoracion, ciclo de codigo
+- [ ] integracion/API: bloqueos por no verificado, voto OK con codigo valido, update sin duplicado, resumen correcto
+- [ ] funcional UI: detalle con rating agregado, proveedor genera codigo, cliente vota con elegibilidad
+
+## Session Update (2026-04-29) - Cadastral Production Go-Live
+- [x] Fix backend desplegado a `main`:
+- [x] `fix(cadastral): harden API errors and guard migration for existing table` (`6a082b3`)
+- [x] Migracion ejecutada en produccion (`cadastral_prices`).
+- [x] Registro manual de migracion aplicado por esquema legacy de tabla `migrations`.
+- [x] Cache Laravel limpiada en produccion (`php artisan optimize:clear`).
+- [x] CSV catastral subido e importado en produccion (`precios_m2_catalunya_detallado.csv`).
+- [x] Validacion funcional online completada:
+- [x] calculo base por direccion + m2 en home
+- [x] paso a calculadora avanzada con estimacion visible
+- [ ] Pendiente operativo recomendado:
+- [ ] ejecutar backup post-deploy y registrar ruta final del dump.
+
+## Session Update (2026-04-27)
+- [x] Reglas de primera etapa JM aplicadas para proveedor de servicios:
+- [x] alta de proveedor sin campos de tipo/numero de documento en UI de registro
+- [x] WhatsApp obligatorio mantenido
+- [x] telefono fijo opcional mantenido
+- [x] direccion opcional permitida para alta/edicion de perfil
+- [x] guardado de servicios proveedor sin bloqueo por direccion faltante
+- [x] Validacion operativa reportada:
+- [x] edicion de perfil online OK
+- [x] flujo de servicios online OK
+- [ ] Pendiente cierre de negocio: pruebas online finales por Gala y JM
+
+## Session Update (2026-04-27) - Frontend Calculador Catastral V1
+- [x] Nueva seccion `Calculador catastral` agregada en home, debajo del HERO.
+- [x] Fondo estatico integrado con `public/img/mapa-calculator.webp`.
+- [x] UI V1 implementada sin logica de calculo:
+- [x] input unico de direccion (`#cadastral-address-input`)
+- [x] input de m2 requerido para habilitar calculo
+- [x] validacion de direccion por Google integrada en home (place_id + codigo postal)
+- [x] boton preparado para fase 2 (`#cadastral-submit-btn`)
+- [x] script dedicado conectado en home: `public/js/cadastral_calculator.js`
+- [ ] Fase 2 pendiente:
+- [ ] tabla de precios por m2
+- [ ] endpoint de calculo catastral
+- [ ] conexion de boton con flujo real de calculo
+
+## Session Checkpoint (2026-04-21)
+
+### Done
+- [x] Proyecto migrado a Kconecta en branding y referencias principales.
+- [x] Docker local operativo:
+- [x] App: `kconecta`
+- [x] DB: `kconecta-mysql-1`
+- [x] URL local: `http://localhost:8010`
+- [x] Repo GitHub correcto y sincronizado:
+- [x] `https://github.com/sttildeveloper/kconecta-crm`
+- [x] `main` publicado
+- [x] remoto final: `origin`
+- [x] Acceso Hostinger y Dokploy validados desde este equipo de oficina.
+- [x] Produccion sincronizada hacia local para pruebas:
+- [x] dump productivo importado en `kconecta_schema`
+- [x] login local validado con las mismas credenciales de produccion
+- [x] Politica operativa definida y publicada:
+- [x] `commit -> push -> autodeploy -> verify`
+- [x] Politica inicial de versionado con tags anotados:
+- [x] `v0.1.0`
+- [x] `v0.1.1`
+- [x] Warning de Apache en produccion corregido:
+- [x] `ServerName` global configurado
+- [x] `AH00558` eliminado de logs de arranque
+- [x] Navegacion del backoffice ajustada:
+- [x] `Dashboard` renombrado a `Escritorio`
+- [x] Integracion Google Maps migrada para proyectos nuevos:
+- [x] autocomplete legacy reemplazado por flujo compatible con `Places API (New)`
+- [x] mapa y reverse geocoding siguen operativos
+- [x] Google Cloud actualizado en proyecto `kconectacrm`:
+- [x] `Maps JavaScript API` habilitada
+- [x] `Places API` habilitada
+- [x] `Places API (New)` habilitada
+- [x] `Geocoding API` habilitada
+- [x] Dokploy con `GOOGLE_MAPS_API_KEY` cargada en produccion
+- [x] Sugerencias de direccion verificadas manualmente en produccion
+- [x] Flujo de creacion de propiedades endurecido:
+- [x] `POST /post/create` reutiliza el flujo real de guardado
+- [x] backend exige direccion resuelta con `latitude` y `longitude`
+- [x] validacion numerica de coordenadas agregada
+- [x] mensajes flash de exito/error visibles en backoffice
+- [x] Conversion de imagenes a `.webp` aplicada antes de persistir archivos en el servidor.
+- [x] Bug de placeholders `Seleccione` corregido:
+- [x] frontend con placeholders no enviables
+- [x] backend ignora valores no numericos en campos `_id`
+- [x] Gestion de multimedia en edicion corregida:
+- [x] al reemplazar portada se borra el archivo previo
+- [x] al reemplazar video se borra el archivo previo
+- [x] borrar imagenes adicionales queda diferido al submit
+- [x] Fallback de portada faltante corregido en vistas de listado, detalle y edicion.
+- [x] Render del simbolo `EUR` corregido en listados de propiedades.
+- [x] Tipos de propiedad validados online en produccion:
+- [x] `Casa o chalet`
+- [x] `Piso`
+- [x] `Local o nave`
+- [x] `Garaje`
+- [x] `Terreno`
+- [x] `Casa rustica`
+- [x] Edicion online validada al menos para `Piso`.
+- [x] Registros incompletos de prueba (`Piso`) diagnosticados y eliminados de produccion.
+- [x] `Garaje` validado online tanto en alta como en edicion para venta y alquiler.
+- [x] Gala probo online el flujo de `Garaje` y funciono correctamente.
+- [x] `Terreno` validado localmente tanto en alta como en edicion para venta y alquiler.
+- [x] Fix aplicado en edicion de `Terreno` para el layout de titulo, sitio web y descripcion.
+- [x] Respaldo productivo validado en host:
+- [x] `/root/kconecta_backups/20260415_1656_pre_commit_sync/db_production.sql`
+- [x] `/root/kconecta_backups/20260415_1656_pre_commit_sync/media_production/img_uploads`
+- [x] `/root/kconecta_backups/20260415_1656_pre_commit_sync/media_production/video_uploads`
+- [x] Incidente de perdida de media post-deploy diagnosticado:
+- [x] causa raiz confirmada en almacenamiento efimero del contenedor
+- [x] volumen persistente Dokploy configurado para `/var/www/html/public/img/uploads`
+- [x] volumen persistente Dokploy configurado para `/var/www/html/public/video/uploads`
+- [x] media historica restaurada desde backup en los volumenes persistentes
+- [x] redeploy de verificacion completado sin perdida de imagenes
+- [x] nueva subida validada online y persistente tras redeploy
+- [x] Seleccion multiple de imagenes en galeria habilitada en formularios de edicion pendientes:
+- [x] `Casa o chalet`
+- [x] `Piso`
+- [x] `Local o nave`
+- [x] `Terreno`
+- [x] `Casa rustica`
+- [x] Validacion local completada para edicion de `Piso` con seleccion multiple en galeria.
+- [x] Validacion local completada para edicion de `Local o nave` con seleccion multiple en galeria.
+- [x] Deploy a produccion del fix de galeria multiple completado desde `main`.
+- [x] Validacion online posterior al deploy reportada como satisfactoria.
+- [x] Mini auditoria de formularios de propiedades completada para detectar naming cruzado y residuos legacy.
+- [x] Limpieza controlada de naming/residuos publicada en:
+- [x] `ee63e5c` - `Clean property form naming and legacy residue`
+- [x] Cambio de `Terreno` implementado y publicado en:
+- [x] `eadae0a` - `Add terrain use support and normalize land forms`
+- [x] Nuevo modelo de datos para `Terreno` implementado:
+- [x] tabla `terrain_use`
+- [x] columna nullable `property.terrain_use_id`
+- [x] Catalogo web/API de `Terreno` separado en:
+- [x] `Tipo de teRústico`
+- [x] `Uso`: `Servicios`, `Residencial`, `Industrial`, `Agrícola`
+- [x] Formulario web de alta de `Terreno` validado online tras aplicar esquema en produccion.
+- [x] Detalle publico de `Terreno` muestra arriba los recuadros:
+- [x] `Tipo de terreno`
+- [x] `Uso`
+- [x] Backup productivo previo al cambio de `Terreno` creado y validado:
+- [x] `/root/kconecta_backups/20260420_2313_pre_terreno/db_production.sql.gz`
+- [x] `/root/kconecta_backups/20260420_2313_pre_terreno/type_of_terrain.tsv`
+- [x] `/root/kconecta_backups/20260420_2313_pre_terreno/terrain_properties.tsv`
+- [x] Contenedor MySQL productivo utilizado para backup del cambio de `Terreno`:
+- [x] `kconecta-crm-b8ejyl.1.uhlwrkdsmasxw6hmpnkio19y3`
+- [x] Contenedor app productivo utilizado para migraciones/cache clear del cambio de `Terreno`:
+- [x] `kconecta-kconectacrm-5oikfs.1.8j4e7feeo9l3yxw5hap9vhw8k`
+- [x] Incidencia `500` en `/post/create_form/9` diagnosticada y resuelta:
+- [x] causa raiz confirmada en migraciones productivas no aplicadas
+- [x] esquema productivo actualizado manualmente
+- [x] cache productiva limpiada
+- [x] pruebas online satisfactorias posteriores a la correccion
+- [x] Particularidad operativa documentada:
+- [x] la tabla legacy `migrations` no acepta el registro estandar de Laravel sin poblar campos extra (`version`, `class`, `group`, `namespace`, `time`)
+- [x] durante futuras migraciones productivas puede ser necesario registrar manualmente cada migracion ya ejecutada con `php artisan tinker --execute ... updateOrInsert(...)`
+- [x] Bloque `Terreno` (calificaciones) implementado y publicado en:
+- [x] `703ae94` - `Terreno: calificaciones, usos y detalle público`
+- [x] Bloque `Terreno` (superficies condicionales por tipo) implementado y publicado en:
+- [x] `9cd087e` - `Terreno: mostrar campos de superficie segun tipo`
+- [x] Regla aplicada en formularios de alta/edicion de `Terreno`:
+- [x] si `Tipo de terreno` = `Urbano` o `Urbanizable`, mostrar:
+- [x] `Superficie edificable` (`plot_meters`)
+- [x] `Superficie minima vende/alquila` (`useful_meters`)
+- [x] si cambia a otro tipo, ocultar y limpiar ambos campos en frontend
+- [x] Validacion local reportada:
+- [x] alta de terreno OK
+- [x] edicion de terreno OK (corregido undefined variable en `form_5_update`)
+- [x] Produccion actualizada con nuevas tablas:
+- [x] `terrain_qualification`
+- [x] `terrain_qualifications`
+- [x] Verificacion productiva posterior al deploy:
+- [x] `Schema::hasTable('terrain_qualification') = true`
+- [x] `Schema::hasTable('terrain_qualifications') = true`
+- [x] catalogo `terrain_qualification` con `8` registros
+- [x] Validacion online reportada:
+- [x] detalle publico de terreno muestra `Tipo de calificación` correctamente
+
+### In Progress
+- [ ] Retirar o reconvertir `createService()` y sus flujos asociados al modelo canonico de ficha de proveedor.
+- [ ] Limpieza final de textos mojibake/encoding en vistas legacy.
+- [ ] Retirar aliases API `service_types` y `service_type_ids` cuando los consumidores activos ya usen `specialties` y `specialty_ids`.
+
+### Session Update (2026-04-22)
+- [x] Registro de proveedores alineado:
+- [x] tipos permitidos en registro limitados a `Proveedor de servicios` y `Agente inmobiliario`
+- [x] validaciones CIF/DNI/NIE reforzadas
+- [x] `username` alineado con `Razon social`
+- [x] Perfil de proveedor:
+- [x] foto/logo procesada a WebP 350x350 en backend
+- [x] `username` bloqueado (solo lectura)
+- [x] feedback de carga/guardado en interfaz de perfil
+- [x] Servicios proveedor:
+- [x] formulario de alta sin bloque duplicado de datos de usuario
+- [x] direccion de servicio resuelta desde perfil del proveedor
+- [x] slider en `/post/services` funcional con controles + dots
+- [x] bug visual post-login mitigado en primer render del slider
+- [x] CTA de ver publicacion en listados ajustado a `_blank`
+- [x] Detalle publico de servicio:
+- [x] fix de carga de video por `service_id` en `result_service`
+- [x] Mapas de resultados:
+- [x] icono de marcador migrado a branding Kconecta (`kconecta-map-marker.png`)
+- [x] UX proveedor:
+- [x] boton `Ver video` retirado de cabecera de `/post/services` (video queda en bloque inferior)
+- [x] Verificacion por email en produccion:
+- [x] columna `user.email_verified_at` creada en produccion para evitar `500` en `/verify-email/...`
+- [x] redireccion post-verificacion ajustada por rol (proveedor -> `/post/services`)
+- [x] Persistencia de logos de perfil:
+- [x] volumen Dokploy agregado para `/var/www/html/public/img/photo_profile`
+- [x] restore de logo desde backup validado
+- [x] smoke deploy validado sin perdida de media en rutas persistentes
+- [x] Backup pre-persistencia creado en host:
+- [x] `/root/kconecta_backups/20260422_1739_pre_persist_media`
+
+### Session Update (2026-04-23)
+- [x] Admin -> detalle de usuario proveedor:
+- [x] fix de `500` en `GET /users/{id}` por conteo en columna incorrecta.
+- [x] conteos de servicios validados online:
+- [x] `Publicaciones de servicio`
+- [x] `Tipos de servicio`
+- [x] tags no clicables de tipos de servicio agregados bajo metricas.
+- [x] recorrido online final validado como correcto por negocio.
+- [x] Backoffice -> `Mis propiedades` (`/post/my_posts`) refinado:
+- [x] barra de filtros reorganizada en dos filas segun referencia visual aprobada
+- [x] placeholders/labels alineados (`Titulo o referencia`, `Categoria`, `dd / mm / aaaa`)
+- [x] botonera `Filtrar`/`Limpiar` ajustada y responsive estabilizado
+
+### Next
+- [ ] Recoger feedback final de Gala/JM tras pruebas online de esta etapa y cerrar acta de validacion.
+- [ ] Respaldar BD local.
+- [ ] Comparar media faltante de referencias con respaldo productivo antes de limpiar archivos no trackeados.
+- [ ] Decidir si se limpiaran mas adelante de `type_of_terrain` los valores legacy `Servicios`, `Industrial` y `Afectado` una vez confirmada la no dependencia historica.
+- [ ] Implementar plan de video:
+- [ ] cambiar mensaje de `50MB` a limite real alineado
+- [ ] validar tamano antes de subir
+- [ ] comprimir video en frontend antes del submit
+- [ ] Eliminar la dependencia funcional de `createService()` en favor del mantenimiento de ficha de proveedor.
+- [ ] igualar formularios web y movil por tipo de propiedad.
+
+### Closed
+- [x] Bloque de trabajo de `Terreno` dado por cerrado tras validacion online y documentacion operativa.
+- [x] API v1 proveedores (`/api/agent/services`) implementada historicamente; queda marcada como legacy frente al modelo canonico de ficha de proveedor.
+- [x] Soporte `multipart` en create/update para `cover_image`, `more_images` y `video` en API v1 proveedores.
+- [x] Contrato JSON unificado para API v1 proveedores (`success`, `data`, `meta`, `message`, `errors`).
+- [x] Pruebas feature base agregadas para auth, permisos por rol, ownership y CRUD proveedor.
+- [x] Cobertura de login/token mobile completada: `POST /api/login` retorna Bearer token utilizable para `GET /api/me` (`AuthApiTest`, 2026-05-14).
+- [x] Regresion minima API validada (2026-05-14): `ServiceRatingsApiTest` PASS + smoke `200` en `/api/services` y `/api/services_for_map`.
+- [x] Etapa 2 iniciada (2026-05-14): cobertura extendida en `ProviderServicesApiTest` para matriz de acceso (`403/404`) y validaciones `422` con contrato de errores.
+- [x] Etapa 2 completada (2026-05-14): limites de media aplicados en API v1 proveedores (`5MB` imagen, `50MB` video), politica `403/404` documentada y tests de tamano `422` en verde.
+- [x] Etapa 3 completada (2026-05-14): contrato JSON v1 validado en respuestas de exito y error del CRUD proveedor.
+- [x] Etapa 4 completada (2026-05-14): lifecycle de media multipart validado en update (replace cover/video + delete selectivo de `more_images`).
+- [x] Etapa 5 completada (2026-05-14): plan/documentacion y checklist QA final consolidados para release readiness.
+
+### Security Backlog
+- [ ] Rotar secretos actuales (`APP_KEY`, API keys, credenciales DB).
+- [ ] Forzar actualizacion de passwords por defecto.
+- [ ] Eliminar fallback de login legacy que acepta password en texto plano.
+- [ ] Verificar que no se suban secretos reales al repo.
+- [ ] Mover credenciales sensibles fuera de notas operativas y comandos historicos.
+
+### Notes
+- Mantener este archivo como fuente de verdad para estado y proximos pasos.
+- No reimportar dumps legacy en produccion sin validacion de esquema.
+- No subir dumps, backups ni secretos al repo.
+- Restore local de dumps productivos: usar copia binaria al contenedor MySQL + `mysql --default-character-set=utf8mb4`; no usar `Get-Content ... | mysql`.
+- `todo.md` sigue como archivo local sin trackear; no mezclarlo en commits funcionales.
+- `.codex_tmp` sigue local y sin trackear; no mezclarlo en commits.
+- Para inspeccion rapida de produccion, preferir Hostinger browser terminal si el SSH directo desde este PC vuelve a fallar.
+- `origin/main` quedo alineado con `eadae0a` tras publicar el cambio de `Terreno`.
+- `origin/main` quedo actualizado con `703ae94` para el bloque de `Tipo de calificación` en `Terreno`.
+- `origin/main` quedo actualizado con `9cd087e` para superficies condicionales de `Terreno`.
+- El backup mas reciente util para el cambio de `Terreno` esta en `/root/kconecta_backups/20260420_2313_pre_terreno`.
+- Para backups productivos del CRM, usar directamente el contenedor MySQL:
+- `kconecta-crm-b8ejyl.1.uhlwrkdsmasxw6hmpnkio19y3`
+- Comando validado para dump:
+- `docker exec kconecta-crm-b8ejyl.1.uhlwrkdsmasxw6hmpnkio19y3 sh -lc 'mysqldump --no-tablespaces -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"' > "$BKP_DIR/db_production.sql"`
+- Para migraciones productivas del CRM, usar directamente el contenedor app:
+- `kconecta-kconectacrm-5oikfs.1.8j4e7feeo9l3yxw5hap9vhw8k`
+- Referencias `sadtgnab`, `6ckhqztv` y `cyj5uxrv` tienen media en BD local pero sus archivos no existen en `public/img/uploads`.
+- La persistencia productiva de media ya no esta pendiente: quedo resuelta en Dokploy y validada con redeploy mas subida nueva.
+
+- Context update `2026-04-23`:
+- [x] Corregir cards vacias en `resources/views/page/details.blade.php` (garaje/nave).
+- [x] Reubicar `Fianza` y `Estado de conservacion` al bloque superior de cards pequenas.
+- [x] Aplicar fallback `N/A` en cards superiores cuando falten datos.
+
+- Context update `2026-05-14`:
+- [x] API v1 proveedores cerrada por etapas (1-5) con validacion final `tests/Feature/Api` en verde.
+- [x] Commits por etapa aplicados localmente, sin push (evitar autodeploy).
+- [ ] Esperar instrucciones de JM y Gala para siguiente bloque de desarrollo de app movil.
+
+- Context update `2026-05-18`:
+- [x] Gaps de auditoria mobile cerrados en backend local Docker:
+- [x] catalogo API para `service_type` agregado: `GET /api/agent/service-types`.
+- [x] contrato JSON v1 reforzado en auth (`/api/login`, `/api/me`, `/api/logout`) y ratings (`/api/service-ratings*`).
+- [x] endpoints API de propiedades `agent/*` alineados a contrato JSON v1 (`success`, `data`, `meta`, `message`, `errors`).
+- [x] endpoint legacy `GET /api/delete_more_image` retirado con respuesta `410` y ruta moderna documentada.
+- [x] fallback de password en texto plano eliminado del login API.
+- [x] validacion final API en Docker: `tests/Feature/Api` PASS (20 tests, 177 assertions).
+
+- Context update `2026-05-18` - Cero deuda (Paso 1):
+- [x] Endpoints publicos de discovery (`/api/properties`, `/api/services`, `/api/properties_for_map`, `/api/services_for_map`) alineados a contrato JSON v1.
+- [x] Compatibilidad legacy preservada (`status`, `province`) para no romper consumidores web existentes.
+- [x] Cobertura nueva `PublicDiscoveryApiTest` agregada y en verde.
+
+- Context update `2026-05-18` - Cero deuda (Paso 2):
+- [x] Contrato `401` unificado para rutas API via manejador de excepciones (`bootstrap/app.php`).
+- [x] Ruta web legacy que colisionaba con `/api/delete_more_image` eliminada (`routes/web.php`).
+- [x] Cobertura `PropertyApiContractTest` agregada para contrato en `agent/properties` y deprecacion `410` legacy endpoint.
+
+- Context update `2026-05-18` - Cero deuda (Paso 3):
+- [x] Hardening auth API: `POST /api/login` con rate-limit (`throttle:10,1`).
+- [x] Logout API endurecido: revocacion robusta de token personal y cierre de sesion web.
+- [x] Endpoints utilitarios legacy (`visitor/*`, `property_stats/register`, `verify_token_google`, `send/message/*`) alineados a contrato JSON v1 con compatibilidad legacy.
+- [x] Cobertura `AuthApiTest` y nueva `LegacyUtilityApiContractTest` en verde.
+- [x] Suite API Docker validada: `tests/Feature/Api` PASS (30 tests, 267 assertions).
+
+- Context update `2026-05-18` - Cero deuda (Paso 4):
+- [x] Limpieza de mojibake/UTF-8 aplicada en vistas públicas clave de detalle/compartir.
+- [x] Limpieza de mojibake aplicada en archivos de contexto (`tasks.md`, `roadmap.md`, `agent.md`).
+- [x] Verificación de residuos `Ã/Â` en archivos críticos sin hallazgos.
+- [x] Regresión API en Docker validada: `tests/Feature/Api` PASS (30 tests, 267 assertions).
+
+- Context update `2026-05-18` - Cero deuda (Paso 5):
+- [x] Deuda de testing catastral cerrada:
+- [x] `CadastralImportCommandTest` agrega cobertura de importación inicial + upsert.
+- [x] `CadastralEstimateApiTest` agrega cobertura de estimación con postal code existente + `404` en inexistente.
+- [x] Regresión final API validada en Docker: `tests/Feature/Api` PASS (32 tests, 273 assertions).
+
+
+
+- Context update `2026-05-18` - Cierre productivo API mobile readiness:
+- [x] Commits locales publicados a `origin/main`:
+- [x] `e23ebae` (`throttle` mixto + verificacion email API en JSON 403).
+- [x] `15d6703` (cierre H-02 ratings/work-codes + configuracion CORS).
+- [x] Redeploy productivo ejecutado en Dokploy con codigo actualizado.
+- [x] Cache de Laravel regenerada en contenedor productivo:
+- [x] `php artisan optimize:clear`
+- [x] `php artisan config:cache`
+- [x] `php artisan route:cache`
+- [x] Validacion productiva API:
+- [x] `GET /api/me` -> `401` contrato v1 (`success/data/meta/message/errors`).
+- [x] `GET /api/properties?text=mad` -> `200` contrato v1 + compat legacy (`status`, `province`).
+- [x] `OPTIONS /api/properties` -> `204` con CORS operativo.
+- [x] CORS productivo endurecido:
+- [x] `CORS_ALLOWED_ORIGINS=https://kconecta.com,https://www.kconecta.com`.
+- [x] `Access-Control-Allow-Origin` validado en preflight para `https://kconecta.com`.
+
+- Context update `2026-05-21` - Provider logo canonico para app movil:
+- [x] API perfil proveedor ampliada con lectura canonica:
+- [x] `GET /api/agent/services/profile` ahora incluye `provider_logo_url` y `provider_logo_path`.
+- [x] Regla de no regresion aplicada: `provider_logo_url` no usa `cover_image_url` ni galeria.
+- [x] Nuevo update de perfil proveedor para logo:
+- [x] `PATCH /api/agent/services/profile` acepta `provider_logo` (`jpg,jpeg,png,webp`, max `2048KB`).
+- [x] Compatibilidad legacy temporal habilitada para upload:
+- [x] fallback de campos `logo|photo|avatar|image|company_logo` cuando no llega `provider_logo`.
+- [x] Respuesta de `PATCH` devuelve perfil actualizado con `provider_logo_url`.
+- [x] Coherencia entre clientes:
+- [x] `GET /api/me` incluye `provider_logo_url` y `provider_logo_path`.
+- [x] Cobertura feature agregada/actualizada:
+- [x] `ProviderServicesApiTest` y `AuthApiTest` en verde.
+- [x] Publicado en `origin/main` commit `87941f2` (deploy habilitado para revision mobile).
+
+## Session Update (2026-05-22) - Service metrics online fixed and validated
+- [x] Deployed backend/frontend tracking for provider service KPIs (commit `355e49f`).
+- [x] Added migrations:
+- [x] `2026_05_22_090000_create_service_profile_visits_table`
+- [x] `2026_05_22_090100_create_service_contact_clicks_table`
+- [x] Added/validated tracking endpoints for:
+- [x] profile visit register
+- [x] contact click register
+- [x] Dashboard provider metrics now read from persistent tables:
+- [x] `service_profile_visits`
+- [x] `service_contact_clicks`
+- [x] `service_work_codes` (used tickets)
+- [x] Online validation confirmed with real click/visit:
+- [x] `Visitas al perfil` increments.
+- [x] `Clicks en contacto` increments.
+- [x] `Tickets de servicio` remains consistent.
+
+## Session Incident Note (2026-05-22) - Legacy migrations table drift
+- [x] Root cause identified: production `migrations` table is non-standard and requires:
+- [x] `version`
+- [x] `class`
+- [x] `namespace`
+- [x] `group`
+- [x] `time`
+- [x] Symptom: `SQLSTATE[HY000]: 1364 Field 'version' doesn't have a default value` after physical migration execution.
+- [x] Mitigation used:
+- [x] manual insert into `migrations` with all required legacy fields.
+- [x] re-run `php artisan migrate --force` until `Nothing to migrate`.
+- [x] Additional reconciliation performed:
+- [x] manually created missing table `service_contact_clicks` in production.
+
+## Safe Migration SOP (VPS) - Avoid line-break/quote failures
+- [x] Step 1: refresh dynamic container names every time before commands:
+- [x] `APP_CTN=$(docker ps --format '{{.Names}}' | grep '^kconecta-kconectacrm-5oikfs\.1\.')`
+- [x] `DB_CTN=$(docker ps --format '{{.Names}}' | grep '^kconecta-crm-b8ejyl\.1\.')`
+- [x] Step 2: verify no hidden newlines in vars:
+- [x] `printf '%s\n' "$APP_CTN"`
+- [x] `printf '%s\n' "$DB_CTN"`
+- [x] Step 3: backup before migrate:
+- [x] `mysqldump` from `DB_CTN` into `/root/kconecta_backups/<timestamp>_pre_migrate`.
+- [x] Step 4: migrate in maintenance mode + cache rebuild.
+- [x] Step 5: if legacy error appears, use HEREDOC SQL (not escaped mega one-liners).
+- [x] Step 6: final checks:
+- [x] `php artisan migrate --force` -> `Nothing to migrate`
+- [x] confirm tables exist
+- [x] validate online KPI increment flow
+
+## Nueva tarea Release Compliance (2026-05-22) - Google Play + App Store
+- [ ] Objetivo:
+- [ ] completar auditoria integral de requisitos de publicacion para marketplaces movil (Google Play y App Store) y cerrar brechas de cumplimiento antes de submit.
+
+### Brechas detectadas (prioridad alta)
+- [ ] Publicar URL HTML de `Politica de Privacidad` (publica, accesible, no PDF, no geobloqueada).
+- [ ] Publicar URL HTML de `Eliminar cuenta y datos` (flujo visible y funcional fuera de la app).
+- [ ] Agregar ruta in-app para iniciar eliminacion de cuenta (iOS/Android).
+- [ ] Alinear politica con retencion/eliminacion real de datos (incluye excepciones legales/fraude).
+
+### Google Play - checklist operativo
+- [ ] Play Console -> App content -> Data safety:
+- [ ] declarar recoleccion/uso/comparticion de datos de forma exacta.
+- [ ] responder bloque de eliminacion de cuenta/datos.
+- [ ] Play Console -> Privacy Policy URL:
+- [ ] URL activa HTML (no PDF), editable solo por el propietario, referencia a app o developer.
+- [ ] App:
+- [ ] mostrar acceso a politica de privacidad dentro de la app.
+- [ ] incluir opcion visible para eliminar cuenta en app (o deep-link al flujo web permitido por politica).
+- [ ] Verificar declaraciones de permisos sensibles y coherencia con funcionalidad publicada.
+
+### App Store - checklist operativo
+- [ ] App Store Connect -> App Privacy:
+- [ ] `Privacy Policy URL` obligatorio y publico.
+- [ ] completar nutricion de privacidad (data collected/linked/tracking) coherente con app real + SDKs.
+- [ ] Guideline 5.1.1:
+- [ ] link de politica dentro de la app y en metadata de App Store Connect.
+- [ ] politica debe explicar coleccion, uso, terceros, retencion y eliminacion de datos.
+- [ ] Guideline 5.1.1(v):
+- [ ] si hay cuenta, debe existir eliminacion de cuenta dentro de la app.
+- [ ] Submission readiness:
+- [ ] demo account o demo mode completo para App Review si aplica login.
+- [ ] notas de review y credenciales de prueba actualizadas.
+
+### Entregables minimos (HTML)
+- [ ] `/privacy-policy` (HTML publico).
+- [ ] `/account-deletion` (HTML publico con flujo de solicitud).
+- [ ] contenido legal minimo:
+- [ ] responsable del tratamiento/contacto.
+- [ ] datos recolectados y finalidades.
+- [ ] terceros/SDKs.
+- [ ] retencion de datos.
+- [ ] derechos del usuario (acceso, rectificacion, eliminacion).
+- [ ] proceso y plazo de eliminacion de cuenta/datos.
+
+### Validacion pre-submit
+- [ ] QA funcional:
+- [ ] crear cuenta -> solicitar eliminacion en app -> confirmar solicitud -> estado final.
+- [ ] solicitar eliminacion desde web publica (sin reinstalar app).
+- [ ] QA tecnico:
+- [ ] verificar respuestas API de eliminacion y borrado/anonymizacion de datos asociados.
+- [ ] verificar links en metadata Play/App Store y dentro de la app.
+- [ ] Evidencia:
+- [ ] capturas + video corto del flujo de eliminacion.
+- [ ] checklist firmada por producto/legal/tecnico.
+
+## Session Closure (2026-05-22) - Mobile metrics integration validated online
+- [x] Backend API for provider KPI metrics exposed in mobile profile endpoint.
+- [x] Endpoint confirmed for mobile dashboard:
+- [x] `GET /api/agent/services/profile` now returns KPI fields:
+- [x] `profile_visits`, `profile_visits_change_pct`
+- [x] `contact_clicks`, `contact_clicks_change_pct`
+- [x] `service_tickets`, `service_tickets_change_pct`
+- [x] plus compatibility aliases:
+- [x] `visits_count`, `contact_clicks_count`, `service_tickets_count`
+- [x] Tracking endpoints confirmed and operational:
+- [x] `POST /api/service_stats/register_visit`
+- [x] `POST /api/service_stats/register_contact_click`
+- [x] Local Docker validation completed:
+- [x] `ProviderServicesApiTest` PASS (`22` tests, `195` assertions).
+- [x] Production VPS migration state validated:
+- [x] tables exist: `service_profile_visits`, `service_contact_clicks`, `service_work_codes`.
+- [x] `php artisan migrate --force` => `Nothing to migrate`.
+- [x] migration status shows `2026_05_22_*` as `Ran`.
+- [x] Mobile app online validation completed:
+- [x] dashboard now shows real values for `visitas`, `clicks`, `tickets`.
+
+## Commit/Release Log (2026-05-22)
+- [x] Published to `origin/main`: `d7fa1ed`
+- [x] Commit scope:
+- [x] mobile KPI API exposure in `ProviderServiceApiController@profile`
+- [x] context/runbook updates for safe VPS migration workflow
+
+## Session Update (2026-05-22) - Release blocker compliance (stores) implemented
+- [x] API Password Recovery implemented:
+- [x] `POST /api/forgot-password` (generic anti-enumeration response).
+- [x] `POST /api/reset-password` (token + password reset via Laravel broker).
+- [x] API Account Deletion implemented:
+- [x] `DELETE /api/me` (auth required + password confirmation).
+- [x] compatibility endpoint: `POST /api/account/delete`.
+- [x] account deletion behavior:
+- [x] revoke Sanctum tokens.
+- [x] anonymize direct PII fields in `user`.
+- [x] disable account (`is_active=0` when column exists).
+- [x] remove profile address rows from `user_address` when present.
+- [x] Legal HTML pages published (public, 200 OK):
+- [x] `/legal/privacy`
+- [x] `/legal/terms`
+- [x] `/legal/account-deletion`
+- [x] legacy route `/policy_and_privacy` now redirects to `/legal/privacy`.
+- [x] Automated tests added and passing:
+- [x] `AccountComplianceApiTest` (forgot/reset/delete)
+- [x] `LegalPagesTest` (public legal pages)
+- [x] full API suite in Docker: `48` tests PASS (`358` assertions).
+
+## Session Update (2026-05-22) - Compliance hardening pass (orchestrated)
+- [x] Orchestrated multi-agent audit executed and findings remediated.
+- [x] Security hardening:
+- [x] account delete endpoints now rate-limited (`throttle:5,1`).
+- [x] account deletion audit trail added (`account_deletion_audits` table + insert on delete flow).
+- [x] anonymized deleted email domain moved to config (`config/legal.php`, `DELETED_USER_EMAIL_DOMAIN`).
+- [x] Legal architecture hardening:
+- [x] legal pages refactored to shared layout + shared nav + shared CSS (`public/css/legal.css`).
+- [x] legal content now parameterized from `config/legal.php` (brand/responsible/contact/jurisdiction/SLA/retention).
+- [x] canonical legal route naming added:
+- [x] `legal.privacy`, `legal.terms`, `legal.account-deletion`.
+- [x] legacy route hardened to permanent redirect: `/policy_and_privacy` -> `/legal/privacy` (301).
+- [x] QA hardening:
+- [x] extra tests for unauthenticated delete, alias endpoint parity, and forgot-password rate limit.
+- [x] extra legal tests for required sections + canonical redirect assertion.
+- [x] Docker validation:
+- [x] `AccountComplianceApiTest` PASS.
+- [x] `LegalPagesTest` PASS.
+- [x] full API suite PASS (`51` tests, `369` assertions).
+
+## Session Closure (2026-05-22) - Compliance deploy + migration + mobile handoff
+- [x] Compliance hardening commit published: `c3caab1`.
+- [x] Production deploy executed.
+- [x] VPS migration handled (legacy schema):
+- [x] `2026_05_22_160000_create_account_deletion_audits_table` reconciled and marked as `Ran`.
+- [x] Final migration check passed:
+- [x] `php artisan migrate --force` => `Nothing to migrate`.
+- [x] Compliance endpoints online:
+- [x] `POST /api/forgot-password`
+- [x] `POST /api/reset-password`
+- [x] `DELETE /api/me`
+- [x] `POST /api/account/delete`
+- [x] Legal public pages online:
+- [x] `/legal/privacy`
+- [x] `/legal/terms`
+- [x] `/legal/account-deletion`
+- [x] Native app Codex prompt delivered to implement store-compliance UX flows end-to-end.
+
+## Session Update (2026-05-29) - Final client ratings dashboard API
+- [x] Added authenticated endpoint GET /api/service-ratings/my-dashboard in outes/api.php (uth:sanctum).
+- [x] Implemented ApiController@myServiceRatingsDashboard with:
+- [x] access control (401 UNAUTHENTICATED, 403 ROLE_NOT_ALLOWED).
+- [x] dashboard payload: atingsCount, providersRatedCount, verageStars, ecentRatings.
+- [x] recent activity ordered by updated_at descending (limit 10).
+- [x] provider name fallback chain for robust UI labels.
+- [x] Added/updated feature tests for endpoint auth, role gate, structure, order, and metric correctness.
+- [x] Test run completed: docker compose exec app php artisan test --filter=ServiceRatingsApiTest -> PASS (15 tests, 56 assertions).
+
+## Session Closure (2026-07-26) - New public services home completed locally
+
+### Implementación y QA
+
+- [x] Revisado el contexto y preservado el worktree existente.
+- [x] Sustituido el home inmobiliario por el home aprobado de profesionales.
+- [x] Creados layout, vista, parciales, CSS, JavaScript y hero WebP.
+- [x] Reutilizados datos reales de `service_type`, `user`, `user_address`, `provider_services` y `service_provider_ratings`.
+- [x] Reutilizadas rutas reales de búsqueda, login, alta, legales y ficha pública.
+- [x] Eliminadas del home las referencias a inmuebles y enfermería sin borrar módulos internos.
+- [x] Directorio inicial alfabético, sin distancias.
+- [x] Geolocalización solo tras clic explícito.
+- [x] Distancia Haversine únicamente con coordenadas válidas.
+- [x] Geocodificación manual y fallback alfabético.
+- [x] Responsive y accesibilidad básica completados.
+- [x] Pint, JavaScript, Blade cache y build PASS.
+- [x] Tests PASS: `14` tests / `130` assertions.
+- [x] Capturas finales desktop/móvil generadas.
+
+### Pausa
+
+- [x] Disponible en `http://localhost:8010/`.
+- [x] Sin commit, push ni deploy.
+- [ ] Revisión conjunta con JM/Gala.
+- [ ] QA manual de ubicación y contactos.
+- [ ] Ajustes acordados.
+- [ ] Repetir pruebas, build y capturas.
+- [ ] Pedir autorización antes de commit/push.
+
+### Orquestación
+
+- [x] `qwen3.5:9b` instalado en Ollama.
+- [x] Disponibles DeepSeek, Mistral, Gemma, Qwen 3.5 y Qwen 2.5 Coder.
+- [ ] Integrar Qwen 3.5 como worker o decidir sustitución tras benchmark.
+- [ ] DeepSeek: backend/tests.
+- [ ] Mistral: frontend/responsive/accesibilidad.
+- [ ] Gemma: auditoría/regresiones.
+- [ ] Qwen: segunda revisión/simplificación.
+- [ ] Agente principal: contexto, merge y validación.
+- [ ] Máximo seis rutas por worker; evitar trabajo duplicado.
+
+## Session Update (2026-08-01) - Public provider search and map audit
+
+### Verified current state
+
+- [x] Repository history around 2026-07-16 reviewed; the latest preceding production state is `5c03ff7` (2026-07-14).
+- [x] Public results route remains available without authentication: `GET /result/services`.
+- [x] Public map data route remains available without authentication: `GET /api/services_for_map`.
+- [x] List/map toggle, service filters, province/city grouping and provider markers remain implemented.
+- [x] Leaflet + OpenStreetMap fallback remains available when Google Maps cannot load or authorize.
+- [x] Local HTTP validation: results page `200`, map API `200` and `207` provider locations returned from current local data.
+- [x] Focused regression suites pass: `13` tests and `152` assertions (`PublicDiscoveryApiTest`, `HomePageTest`).
+
+### Google web integration
+
+- [x] Historical home suggestions used the internal `/api/services` endpoint and database province/city data; the results page separately used Google Places and persisted coordinates on place selection.
+- [x] The former CRM key was rejected for browser Places requests because it is restricted as an Android client key.
+- [x] Public results and the OpenStreetMap map do not depend on the new Google key.
+- [x] Created a separate browser key restricted by HTTP referrers for local and production CRM domains.
+- [x] Enabled `Maps JavaScript API`, `Places API`, `Places API (New)` and `Geocoding API` for the browser key.
+- [x] Configured the browser key locally as `GOOGLE_MAPS_API_KEY` without changing either mobile Android key.
+- [x] Browser validation: `08029` returns `08029 Barcelona`; selection resolves city, province, latitude and longitude and submits to `/result/services`.
+- [x] Imported a fresh production dump before changing geographic result matching.
+- [x] Changed the home result mode from list (`mode=1`) to map (`mode=2`).
+- [x] Replaced literal-only matching with coordinate-aware discovery while retaining fallbacks.
+- [ ] Revalidate explicit geolocation, map markers, service filters and non-Google fallback end to end against the imported data.
+
+### Delivery state
+
+- [x] Search audit and current behavior documented.
+- [x] Local commit requested after focused regression and secret audit.
+- [x] Authorization received; push and deployment completed on 2026-08-02.
+
+## Session Update (2026-08-01) - Local provider geography sanitation
+
+- [x] Fresh production dump imported only into local Docker MySQL.
+- [x] Audited 2,903 providers: 2,895 geolocated and 8 incomplete profiles.
+- [x] Added deterministic dry-run/apply command `providers:sanitize-addresses`.
+- [x] Added a reviewed mapping for all 109 geolocated provider cities.
+- [x] Normalized 2,895 local provider addresses; 0 invalid provinces remain among geolocated providers.
+- [x] Preserved the 8 incomplete profiles without fabricating coordinates or locations.
+- [x] Restored the sanitized dump into a temporary database and matched all provider counts.
+- [x] Fixed Google-selected locations so structured city/province filters are not combined with incompatible literal address matching.
+- [x] Home search now opens historical map mode (`mode=2`).
+- [x] Local QA: `08029 Barcelona` plus the selected specialty returns 215 providers instead of 0.
+- [x] Focused sanitation tests pass: 3 tests / 17 assertions.
+- [x] Public discovery and home tests pass: 15 tests / 161 assertions.
+- [x] Detailed procedure recorded in `docs/provider-address-sanitization.md`.
+- [x] Fixed the CSV importer last so future imports cannot store a country as province.
+- [x] Import rows with coordinates are blocked when no valid province can be resolved.
+- [x] Complete regression suite passes: 142 tests / 876 assertions.
+- [x] Local database was not uploaded wholesale; production used a fresh backup and the transactional command.
+- [x] Push, autodeploy and production sanitation were explicitly authorized.
+- [x] Fresh production backup created and verified on 2026-08-02 before sanitation dry-run.
+- [x] Production backup checksum: `e8a72eec0b5c14360bda89c858c32a652cc4edb651f22df23ce42f9dcaccf397`.
+- [x] Installed only the sanitation command and city catalog in the active production container; no autodeploy was triggered.
+- [x] Production dry-run matches local audit: 2,903 providers, 2,895 pending normalizations, 8 incomplete, 0 unresolved cities.
+- [x] Explicit authorization received and a second fresh backup was verified before `--apply`.
+- [x] Production `--apply` normalized 2,895 addresses transactionally.
+- [x] Post-apply dry-run: 2,903 providers, 8 incomplete, 0 unresolved and 0 pending.
+- [x] Dedicated web Google key persisted in Dokploy and verified from production.
+- [x] Coordinate search fallback implemented for empty city/province responses.
+- [x] Browser history fixed with `replaceState`; Back returns to the home.
+- [x] Commit `52854d7` pushed, autodeployed and smoke-tested.
+- [x] Final suite: 146 tests / 1,382 assertions.
+- [ ] Pending manual business QA: geolocation allow/deny, marker/contact review and
+  explicit Leaflet fallback validation.
+
+## Session Update (2026-08-02) - Provider default photos applied
+
+- [x] Read-only production audit: 2,903 providers, 1 with photo and 2,902 without.
+- [x] Implemented idempotent dry-run/apply command with per-provider file copies.
+- [x] Preserved the existing real photo and avoided a deletable shared default file.
+- [x] Full suite: 148 tests / 1,394 assertions.
+- [x] Verified persistent media volume and 73 GB free before apply.
+- [x] Created and downloaded fresh DB and `photo_profile` backups with matching hashes.
+- [x] Applied 2,902 DB assignments and created 2,902 individual WebP copies.
+- [x] Post-check: 0 providers without photo and 0 copied files with bad hash.
+- [x] Public provider 2378 and its image return HTTP 200.
+- [x] Runbook: `docs/provider-default-photos.md`.
+
+## Session Update (2026-08-02) - Production map recovery
+
+- [x] Reproduced `500` in `/api/services_for_map` and confirmed missing `provider_user_id`.
+- [x] Created and verified pre-migration production backup and SHA-256.
+- [x] Applied and reconciled the three provider-media migrations in batches 16-18.
+- [x] Cleared Laravel caches; production map endpoint returns HTTP 200 again.
+- [x] Confirmed 1,522 geolocated providers in Barcelona.
+- [x] Fixed blank `sti[]=` so searches without a specialty do not become type `0`.
+- [x] Added page/API regression; `PublicDiscoveryApiTest`: 14 tests, 131 assertions.
+- [x] Commits `52a3e39`, `55012b5` and `13ac8da` autodeployed and verified in production.
+- [x] Production API returns 1,522 valid-coordinate Barcelona providers.
+- [ ] Complete manual business QA for provider cards, profile links and contacts.
+
+## Session Update (2026-08-02) - Provider map clustering
+
+- [x] Preserve the requested address center instead of fitting all city results.
+- [x] Enforce minimum zoom 13 for searches resolved from an address.
+- [x] Group nearby Google markers into branded count clusters through zoom 19.
+- [x] Keep individual Kconecta markers and a no-cluster fallback.
+- [x] Focused public search/home suite: 18 tests, 179 assertions.
+- [x] Confirmed the initial online clustering/zoom behavior before replacing cluster clicks with the provider panel.
+- [ ] Validate individual provider popup/contact behavior as part of business QA.
+
+## Session Update (2026-08-02) - Stacked provider cluster panel
+
+- [x] Audited L'Hospitalet: 127 providers, 70 coordinate groups and 29 profiles on one exact point.
+- [x] Replaced automatic cluster zoom with a scrollable provider list panel.
+- [x] Added provider name, address, specialties, rating and profile link without shifting coordinates.
+- [x] Added close button, Escape support and responsive mobile presentation.
+- [x] Rendered map JavaScript passes `node --check`; focused regression is 18 tests / 182 assertions.
+- [x] Commit `13ac8da` deployed; production HTML, JavaScript and responsive CSS verified.
+- [x] Production audit for the test area: 127 providers, with a maximum exact stack of 29.
+- [ ] Validate visually that an online cluster count matches its rendered provider cards and links.
+
+## Session Update (2026-08-03) - Current handoff
+
+- [x] Public map/schema incident resolved without replacing production with a local dump.
+- [x] Blank specialty searches, dense markers and exact-coordinate stacks have regression coverage.
+- [x] Git `main`, `origin/main` and production code verified at `13ac8da` before this documentation update.
+- [ ] Run production default cover/gallery backfill only after fresh DB/uploads backup and dry-run.
+- [ ] Keep `service`, `service_address` and legacy `service_id` compatibility until web/mobile QA and reference inventory reach zero.
+
+## Session Update (2026-08-29) - Local service-type provider media
+
+- [x] Validated the 28 WebP source images in `public/img/service-types/WEBP`.
+- [x] Implemented idempotent dry-run/apply command `providers:backfill-service-type-media`.
+- [x] Preserve all real cover/gallery rows and replace only generic provider media.
+- [x] Store independent copies under `img/uploads/providers/{provider_id}/`.
+- [x] Hardened web/API deletion so providers can replace nested default files safely.
+- [x] Created and verified local pre-apply DB backup; SHA-256 `69419A58BE1D5343B2AF22326F7A57B7A2B3A8F76CBF3D101E15C6EBC9E0889E`.
+- [x] Applied locally: 2,892 covers, 97 gallery images and 2,989 new files.
+- [x] Removed 17,357 previous generic copies; 7 providers without specialties remain unchanged.
+- [x] Post-audit: 0 pending changes, missing files, bad hashes, invalid names or orphan files.
+- [x] Focused regression: 17 tests / 128 assertions.
+- [x] Complete regression suite: 162 tests / 1,542 assertions.
+- [x] Runbook: `docs/provider-service-type-media.md`.
+- [x] Production cover-only phase applied after verified DB/uploads backups.
+- [x] Added `--covers-only` production scope and a neutral fallback cover for providers without specialties.
+- [x] Production authorization received for the cover-only phase on 2026-08-29.
+- [x] Production result: 4,552/4,552 providers have a cover; 4 real covers preserved and 4,548 generic covers created.
+- [x] Production gallery remained unchanged; 0 generic gallery rows were created.
+- [x] Production audit: 0 pending changes, missing files, bad hashes, orphan files or dual legacy links.
+- [x] Online smoke test: provider pages and cover images 71, 90, 101 and 4628 return HTTP 200.
+- [ ] Gallery population remains a separate, explicitly authorized phase.
+
+## Session Update (2026-08-29) - Provider gallery maximum
+
+- [x] Centralized the provider gallery maximum at five images; the cover remains independent.
+- [x] Enforced the projected final count before writes in the provider web editor.
+- [x] Enforced the same rule in the canonical mobile API and legacy service aliases.
+- [x] Exposed `gallery_max_images` in the mobile provider-profile payload.
+- [x] Updated population to create one gallery image per specialty, including the primary specialty, capped at five.
+- [x] Preserve real gallery photos and replace generic samples when a provider uploads real photos.
+- [x] Fixed provider media query grouping so a requested deletion cannot expand to every canonical gallery row.
+- [x] Focused regression: 20 tests / 134 assertions.
+- [x] Complete regression suite: 169 tests / 1,591 assertions.
+- [x] Read-only local population simulation: 0 missing specialty sources and no writes applied.
+- [x] Deployed the limit in commit `73f3282` after explicit authorization.
+- [x] Created and integrity-checked fresh DB/uploads backups before production population.
+- [x] Production dry run: 4,552 providers, 4,772 planned gallery copies and 0 missing sources.
+- [x] Production apply: 4,772 generic gallery rows/files for 4,541 providers; 0 covers modified.
+- [x] Production audit: 0 pending assignments, missing files, bad hashes, orphans, duplicate paths or generated galleries over five.
+- [x] Public smoke checks for providers 68, 90, 115 and their gallery images return HTTP 200.
+- [x] Saved the mobile Codex handoff prompt in `docs/mobile-provider-gallery-codex-prompt.md`.
+- [ ] Decide manually which real photo to remove from legacy provider 4538, whose six pre-existing real images were preserved.
+
+## Session Update (2026-09-02) - Mobile provider profile API contract
+
+- [x] Added canonical partial `GET|PATCH /api/me` contract with multipart
+  `_method=PATCH`, unique email validation and verification invalidation.
+- [x] Added safe 2 MB personal photo replacement, converted to 350 x 350 WEBP.
+- [x] Separated commercial phone fields from personal account phone fields and
+  backfilled current provider contacts locally.
+- [x] Kept structured `user_address` as the only commercial location source for
+  the public provider endpoint and services map; no personal-address fallback.
+- [x] Added canonical `gallery` payload with path, URL and persistent position;
+  retained `more_images` as a legacy alias.
+- [x] Added canonical multipart `gallery_images[]`, JSON-compatible
+  `gallery_delete_ids` and exact `gallery_order` validation.
+- [x] Enforced ownership, physical deletion, stable ordering, maximum five
+  images and transactional rollback for multi-image gallery persistence.
+- [x] Convert commercial cover/gallery uploads to WEBP with a maximum 1920 px
+  side; preserve safe video replacement and return path plus URL.
+- [x] Added migration-repository compatibility defaults required by the legacy
+  local/production migrations table.
+- [x] Applied and audited the three new migrations locally: 0 provider gallery
+  rows without position and 0 providers with an uncopied existing phone.
+- [x] Documented the backend contract in
+  `docs/mobile-provider-profile-api-contract.md` and updated the mobile Codex
+  handoff prompt.
+- [x] Focused integration regression: 63 tests / 466 assertions.
+- [x] Complete CRM regression: 177 tests / 1,667 assertions.
+- [x] Committed and pushed as `4fc543b` (`feat: add mobile provider profile contract`).
+- [x] Created and integrity-checked production DB backup before migrations:
+  `/root/kconecta_backups/20260901_231002_pre_mobile_profile_migrations/db_production.sql.gz`.
+- [x] Production backup SHA-256:
+  `10b03c176c93b0902c64622ca03fce569e8a60982c6cbfc037b30d6c5cf057fe`.
+- [x] Applied all three production migrations successfully with `MIGRATE_STATUS=0`.
+- [x] Cleared application caches and rebuilt configuration and route caches.
+- [x] Verified online HTTP 200 for home, provider page, public provider API,
+  services map, cover and gallery image; `/api/me` returns expected unauthenticated 401.
+- [x] Confirmed 4,707 public providers through the production API.
+- [x] Delivered the updated implementation prompt to the Codex of the mobile app.
+- [ ] Mobile Codex is continuing implementation and validation in the native app repository.
+
+## Session Update (2026-09-02) - Google Play compliance preparation
+
+- [x] Centralized API and web self-service account deletion in a transactional service with safe file staging/rollback.
+- [x] Removed provider profile media, public address, specialties, legacy services, tokens, indexed sessions and service metrics; unpublished property listings for other account roles.
+- [x] Initially kept ratings, work codes, tickets, messages and audits on configurable `retain` defaults pending business/legal approval.
+- [x] Added authenticated UGC report and user block APIs, duplicate-abuse protection, moderation states and an admin review panel.
+- [x] Added versioned legal acceptance storage and optional mobile registration payload; enforcement remains disabled until coordinated release.
+- [x] Replaced binary cookie behavior with versioned category consent and gated AdSense behind advertising consent.
+- [x] Added daily log defaults, separate retention settings, read-only inventory and dry-run-first prune commands; backup deletion is excluded.
+- [x] Hardened public contact/share mail flows with internal recipient/link resolution, POST sharing, validation, honeypot and strict limits.
+- [x] Expanded legal templates and documented JM inputs without publishing invented legal identity, age or jurisdiction.
+- [x] Added `docs/mobile-compliance-contract.md` and `docs/google-play-compliance.md`.
+- [x] Focused compliance regression: 21 tests / 103 assertions before final hardening; targeted post-hardening checks also passed.
+- [x] Final complete local regression: 189 tests / 1,749 assertions.
+- [x] Definitive operational retention/deletion defaults approved on 2026-09-06; legal identity variables remain pending.
+- [ ] Coordinate legal-acceptance enforcement with a compatible mobile release before enabling the flag.
+- [x] Commit and push authorized on 2026-09-06 to close the CRM implementation.
+- [x] Release `661763a` deployed and migrations `2026_09_02_130000` and `2026_09_02_131000` applied successfully as production batch 20.
+- [x] Fresh pre-migration production backup validated at `/root/kconecta_backups/20260906_095916_pre_compliance_migrations_retry/db_production.sql.gz`.
+
+## Session Update (2026-09-06) - Approved retention policies (local only)
+
+- [x] Set approved defaults: logs 90 days, IP 30, user agents 90, identifiable metrics 395, closed tickets/messages 730, audits and resolved reports 1,095, rejected reports 365, deleted-account legal acceptances and blocked work codes 1,825.
+- [x] Extended account deletion policies with `anonymize` and `block` behavior while preserving explicit `retain` and `delete` overrides.
+- [x] Work codes owned by a deleted provider are irreversibly invalidated; deleted-client links are removed.
+- [x] Owned tickets/messages are closed and despersonalized immediately; closed records expire after 730 days.
+- [x] Retention inventory and explicit `--apply` pruning now cover legal acceptances, work codes, report states, IP and user-agent redaction.
+- [x] Backups remain excluded from all application pruning.
+- [x] Updated legal templates for Hostinger Paris/Netherlands infrastructure, Arsys/IONOS email, AdSense consent and exact retention periods.
+- [x] Set privacy/support contact defaults to `info@kconecta.com`.
+- [x] Set the confirmed minimum registration/use age to 18 and both initial legal document versions to `1.0`.
+- [x] Local runtime verified with daily logs and approved values; legal registration enforcement intentionally remains disabled pending compatible web/mobile registration.
+- [x] Focused tests: 33 / 166 assertions; complete regression: 192 / 1,774 assertions.
+- [ ] No commit, push, deployment or production environment change has been performed for this follow-up.
+
+## Session Update (2026-09-06) - Web legal acceptance controls (local only)
+
+- [x] Add separate mandatory Terms and Privacy controls to both web registration forms.
+- [x] Validate the submitted document versions against current version `1.0` on the server.
+- [x] Persist document type, version, timestamp, IP and user agent after successful registration.
+- [x] Reject missing confirmations and stale or tampered versions.
+- [x] Keep the mobile API registration requirement disabled until the native release is coordinated.
+- [x] Focused tests: 10 / 78 assertions; Blade cache PASS.
+- [x] Complete regression suite: 195 tests / 1,803 assertions, all passing.
+- [ ] No commit, push, deployment or production change has been performed.
+
+## Pause checkpoint (2026-09-06) - Awaiting JM / mobile Codex
+
+- [x] Updated README, agent context, compliance summary and restart prompt.
+- [x] Delivered the mobile implementation prompt covering legal acceptance,
+  deletion, UGC safety, Data Safety audit and APK/AAB preparation.
+- [ ] Receive JM legal identity, applicable-law confirmation, effective date,
+  moderation owner/SLA and email deletion-request SLA.
+- [ ] Receive mobile Codex implementation/test report and SDK/permission inventory.
+- [ ] Complete legal text review with JM-provided values; never invent them.
+- [ ] Re-run focused and complete CRM regression after final values are integrated.
+- [ ] Only then request authorization for commit/push; push to `main` autodeploys.
+- [ ] After deployment and mobile compatibility confirmation, enable
+  `LEGAL_ACCEPTANCE_REQUIRED_ON_REGISTRATION=true` and run production smoke checks.
+- [ ] Google reviewer credentials are available to the owner but are not needed now;
+  use dedicated non-admin test accounts through Play Console App access later.
+
+## Session Update (2026-09-08) - Legal identity completed locally
+
+- [x] Set `Sttil Tecnology`, CIF `B19403427`, as the company responsible for the
+  treatment and operator of the `KConecta` brand.
+- [x] Set the confirmed legal address, contact phone and Spanish applicable-law
+  wording while preserving mandatory consumer rights and jurisdiction.
+- [x] Keep José María Bardina Arancibia and his DNI out of public pages and runtime
+  configuration; the company is the controller, not its representative personally.
+- [x] Record Miguel Yesan only as the internal moderation owner; public legal pages
+  refer to the company's moderation team and support channel.
+- [x] Expand privacy information, user rights, AEPD complaint route, UGC moderation,
+  account deletion and company identification across the three canonical pages.
+- [x] Blade cache and public local HTTP checks passed for all three legal URLs.
+- [x] Complete regression: 195 tests / 1,815 assertions.
+- [ ] Add the company's applicable Mercantile Registry details when JM provides them.
+- [ ] Confirm the publication/effective date for legal version `1.0` and the response
+  targets for moderation and email-based deletion requests.
+- [ ] No commit, push, deployment or production change has been performed.
+
+## Session Update (2026-09-08) - HTTP security headers (local only)
+
+- [x] Add global `X-Frame-Options: SAMEORIGIN` protection for web and API responses.
+- [x] Add global `X-Content-Type-Options: nosniff` protection.
+- [x] Add `Strict-Transport-Security: max-age=31536000` only when the request is
+  HTTPS, including trusted Dokploy reverse-proxy requests.
+- [x] Verify plain local HTTP does not receive HSTS.
+- [x] Focused security/legal checks: 4 tests / 52 assertions.
+- [x] Complete regression: 197 tests / 1,835 assertions.
+- [ ] Commit, push and production verification require explicit authorization.
+

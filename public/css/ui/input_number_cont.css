@@ -1,0 +1,39 @@
+.container-controls-cont-ui{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: .3rem;   
+    width: 100%;
+}
+.container-controls-cont-ui .icon-ui{
+    padding: .4rem;
+    background-color: var(--color-main-1);
+    cursor: pointer;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    color: #ffffff;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+
+
+/*
+
+<div class="container-controls-cont-ui">
+    <span class="icon-ui is-left" id="n_bar_rest">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16"><path fill="#ffffff" stroke="#ffffff" stroke-linecap="round" stroke-width="2" d="M3 8h10"/></svg>                      
+    </span>
+    <input class="input" readonly name="n_bar" id="n_bar" type="number" value="<?= $n_bar ?>" style="text-align: center;"/>
+    <span class="icon-ui is-right" id="n_bar_sum">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#ffffff" d="M11 21v-8H3v-2h8V3h2v8h8v2h-8v8z"/></svg>
+    </span>
+</div>
+
+
+conectar con sum_rest de helpers.js
+*/

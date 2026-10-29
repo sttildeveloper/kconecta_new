@@ -1,0 +1,141 @@
+body {
+  display: block;
+  align-items: stretch;
+  background: #f4f6f9;
+  color: #0f172a;
+}
+
+.container-title-page {
+  max-width: 72rem;
+  margin: 0 auto 1.2rem;
+  padding-top: 0;
+}
+
+.container-title-page h2 {
+  color: #0b1324;
+  margin-bottom: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.container-title-page h2 span {
+  color: #63c4ca;
+}
+
+.container-main {
+  max-width: 72rem;
+  margin: 0 auto;
+  background: transparent;
+  height: auto;
+  padding: 0;
+  display: grid;
+  gap: 1.2rem;
+  padding-bottom: 2rem;
+}
+
+.container-main .box {
+  border: 1px solid #e2e7ef;
+  border-radius: 1rem;
+  box-shadow: 0 16px 30px rgba(12, 21, 43, 0.08);
+  background: #ffffff;
+  padding: 1.2rem 1.4rem;
+}
+
+.container-main .container-row-form-images .container-main-template-input-simple {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid #e2e7ef;
+}
+
+.container-main .container-button-save {
+  border-radius: 999px;
+  font-weight: 700;
+  padding: 0.7rem 1.6rem;
+}
+
+.container-main input[type="text"],
+.container-main input[type="email"],
+.container-main input[type="password"],
+.container-main input[type="number"],
+.container-main input[type="url"],
+.container-main input[type="date"],
+.container-main .input,
+.container-main select,
+.container-main textarea {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.65rem;
+  min-height: 2.6rem;
+  padding: 0.55rem 0.75rem;
+  color: #0f172a;
+}
+
+.container-main textarea {
+  min-height: 140px;
+}
+
+.container-main input:focus,
+.container-main select:focus,
+.container-main textarea:focus,
+.container-main .input-ui:focus {
+  outline: none;
+  border-color: var(--color-main-1);
+  box-shadow: 0 0 0 3px rgba(99, 196, 202, 0.2);
+}
+
+.container-main .container-google-maps-required-tags .button {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.65rem;
+}
+
+.container-main .property-description-row {
+  grid-template-columns: minmax(0, 2.3fr) minmax(16rem, 1fr);
+  align-items: end;
+}
+
+.container-main .property-description-title,
+.container-main .property-description-website,
+.container-main .property-description-textarea {
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.container-main .property-description-title .input,
+.container-main .property-description-website .input,
+.container-main .property-description-textarea .textarea {
+  width: 100%;
+  max-width: 100%;
+}
+
+.container-main .property-description-textarea .textarea {
+  min-height: 7.9rem;
+  resize: vertical;
+}
+
+.container-main .service-description-textarea {
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.container-main .service-description-textarea .textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 12rem;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+@media (max-width: 960px) {
+  .container-title-page,
+  .container-main {
+    max-width: 100%;
+  }
+
+  .container-main .property-description-row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,42 @@
+name: kconecta_new
+
+services:
+  app:
+    container_name: kconecta_new-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8011:80"
+    env_file:
+      - .env
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8011
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: kconecta_new
+      DB_USERNAME: root
+      DB_PASSWORD: secret
+    depends_on:
+      - mysql
+    volumes:
+      - .:/var/www/html
+      - kconecta_new-vendor:/var/www/html/vendor
+      - kconecta_new-build:/var/www/html/public/build
+
+  mysql:
+    container_name: kconecta_new-mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: kconecta_new
+      MYSQL_ROOT_PASSWORD: secret
+    volumes:
+      - kconecta_new-db-data:/var/lib/mysql
+
+volumes:
+  kconecta_new-db-data:
+  kconecta_new-vendor:
+  kconecta_new-build:
