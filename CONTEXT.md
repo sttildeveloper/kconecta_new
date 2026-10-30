@@ -105,3 +105,10 @@ Agregar aquí, para cada nueva fase:
 - Ruta: `/result_provider/{id}`.
 - Cambio visual: se incorporan en `site-navbar.css` los estilos compartidos de la cabecera, que estaban definidos solo en la hoja de inicio. Esto evita que el logotipo aparezca a tamaño natural y que los enlaces de navegación se muestren sin formato en las fichas de proveedor.
 - Comportamiento: no modifica consultas, datos ni enlaces de navegación; queda pendiente de revisión visual manual en escritorio y móvil.
+
+## Auditoría visual pendiente — lista y filtros de resultados (30 de octubre de 2026)
+
+- Ruta: `/result/services`.
+- Referencia: propuesta visual aprobada de resultados y hoja inferior de filtros.
+- Cambio visual: se elimina la acción visible “Ver perfil”; toda la tarjeta del proveedor abre su perfil, excepto sus controles propios. “Contactar” continúa siendo la única acción visible. Los filtros dejan de ocupar espacio en la lista y se muestran en una hoja inferior al pulsar el icono de filtros.
+- Comportamiento: se conservan la búsqueda, la consulta real de proveedores, los parámetros de orden y los umbrales de valoración ya autorizados. La hoja permite ajustar valores y aplicarlos explícitamente con “Ver resultados”; queda pendiente la comprobación visual manual en escritorio y móvil.

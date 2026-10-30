@@ -50,16 +50,9 @@
 
     <section class="results-content" aria-labelledby="results-title">
         <h1 id="results-title">Resultados: {{ $resultTitle }}</h1>
-        <p class="results-subtitle">{{ $quantity }} profesionales encontrados en la base local</p>
+        <p class="results-subtitle">Profesionales cerca de ti</p>
 
         <div class="results-layout">
-            <aside class="results-filters" aria-label="Filtros de resultados">
-                <h2>Filtros</h2>
-                <fieldset><legend>Ordenar por</legend><div class="filter-options"><button type="button" class="{{ $sort === 'distance' ? 'is-active' : '' }}" aria-pressed="{{ $sort === 'distance' ? 'true' : 'false' }}" data-results-sort="distance">Distancia</button><button type="button" class="{{ $sort === 'rating' ? 'is-active' : '' }}" aria-pressed="{{ $sort === 'rating' ? 'true' : 'false' }}" data-results-sort="rating">Valoración</button></div></fieldset>
-                <fieldset><legend>Valoración mínima</legend><div class="filter-options"><button type="button" class="{{ $minRating === 0.0 ? 'is-active' : '' }}" aria-pressed="{{ $minRating === 0.0 ? 'true' : 'false' }}" data-results-min-rating="0">Todas</button><button type="button" class="{{ $minRating === 4.5 ? 'is-active' : '' }}" aria-pressed="{{ $minRating === 4.5 ? 'true' : 'false' }}" data-results-min-rating="4.5">4,5+</button><button type="button" class="{{ $minRating === 4.8 ? 'is-active' : '' }}" aria-pressed="{{ $minRating === 4.8 ? 'true' : 'false' }}" data-results-min-rating="4.8">4,8+</button></div></fieldset>
-                <p>Ordena por distancia o valoración y limita el resultado por promedio de estrellas.</p>
-            </aside>
-
             <div class="results-list">
                 <form class="results-search" data-results-search method="get" action="{{ url('/result/services') }}">
                     @foreach ($paginationQuery as $key => $value)
@@ -76,6 +69,9 @@
                     <label class="sr-only" for="professional-query">Buscar por nombre, apellidos o razón social</label>
                     <span aria-hidden="true">⌕</span><input id="professional-query" name="q" type="search" value="{{ $searchTerm }}" placeholder="Buscar por nombre o empresa" autocomplete="off"><button type="submit" aria-label="Buscar profesionales">⌕</button>
                 </form>
+                <button class="results-filter-trigger" type="button" aria-label="Abrir filtros" aria-expanded="false" aria-controls="results-filter-sheet" data-results-filter-open>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h3M11 17h9M14 4v6M7 14v6"/></svg>
+                </button>
                 <h2><span data-results-count>{{ count($properties) }}</span> perfiles mostrados <small>de {{ $quantity }} encontrados</small></h2>
                 <p class="results-disclaimer"><span aria-hidden="true">ⓘ</span> Los perfiles proceden de la base local. La distancia y la valoración se calculan con sus datos registrados.</p>
 
@@ -109,7 +105,7 @@
                                 ? 'https://wa.me/'.$whatsappPhone.'?text='.urlencode('Hola, me interesa tu servicio')
                                 : null;
                         @endphp
-                        <article class="professional-card" data-professional-card data-professional-name="{{ $profileName }}">
+                        <article class="professional-card" data-professional-card data-professional-name="{{ $profileName }}" data-profile-url="{{ url('/result_provider/'.data_get($property, 'id')) }}" tabindex="0" role="link" aria-label="Abrir perfil de {{ $profileName }}">
                             <img src="{{ $portrait }}" alt="Retrato ilustrativo para {{ $profileName }}">
                             <div class="professional-card__body">
                                 <small>{{ $resultLabel }}</small>
@@ -124,7 +120,6 @@
                                     @else
                                         <span class="professional-contact is-disabled" aria-disabled="true" style="display:grid;min-height:45px;padding:0 20px;place-items:center;border:2px solid #9aa8b5;border-radius:23px;color:#68788a;background:#eef2f5;font-size:14px;font-weight:800;">WhatsApp no disponible</span>
                                     @endif
-                                    <a href="{{ url('/result_provider/'.data_get($property, 'id')) }}">Ver perfil</a>
                                 </div>
                             </div>
                             <button class="professional-favorite" type="button" aria-label="Añadir {{ $profileName }} a favoritos" data-favorite>♡</button>
@@ -145,6 +140,16 @@
         </div>
     </section>
 </main>
+<div class="results-filter-modal" id="results-filter-sheet" data-results-filter-modal aria-hidden="true">
+    <button class="results-filter-backdrop" type="button" tabindex="-1" aria-label="Cerrar filtros" data-results-filter-close></button>
+    <section class="results-filter-sheet" role="dialog" aria-modal="true" aria-labelledby="results-filter-title">
+        <div class="results-filter-handle" aria-hidden="true"></div>
+        <div class="results-filter-heading"><div><h2 id="results-filter-title">Filtros</h2><p>Ordena los profesionales que quieres ver.</p></div><button type="button" aria-label="Cerrar filtros" data-results-filter-close>×</button></div>
+        <fieldset><legend>Ordenar por</legend><div class="filter-options"><button type="button" class="{{ $sort === 'distance' ? 'is-active' : '' }}" aria-pressed="{{ $sort === 'distance' ? 'true' : 'false' }}" data-results-sort="distance">Distancia</button><button type="button" class="{{ $sort === 'rating' ? 'is-active' : '' }}" aria-pressed="{{ $sort === 'rating' ? 'true' : 'false' }}" data-results-sort="rating">Valoración</button></div></fieldset>
+        <fieldset><legend>Valoración mínima</legend><div class="filter-options"><button type="button" class="{{ $minRating === 0.0 ? 'is-active' : '' }}" aria-pressed="{{ $minRating === 0.0 ? 'true' : 'false' }}" data-results-min-rating="0">Todas</button><button type="button" class="{{ $minRating === 4.5 ? 'is-active' : '' }}" aria-pressed="{{ $minRating === 4.5 ? 'true' : 'false' }}" data-results-min-rating="4.5">4,5+ ★</button><button type="button" class="{{ $minRating === 4.8 ? 'is-active' : '' }}" aria-pressed="{{ $minRating === 4.8 ? 'true' : 'false' }}" data-results-min-rating="4.8">4,8+ ★</button></div></fieldset>
+        <footer class="results-filter-actions"><button type="button" data-results-filter-reset>Restablecer</button><button type="button" data-results-filter-apply>Ver resultados</button></footer>
+    </section>
+</div>
 <script src="{{ asset('js/results-ui.js') }}?v={{ filemtime(public_path('js/results-ui.js')) }}" defer></script>
 </body>
 </html>
