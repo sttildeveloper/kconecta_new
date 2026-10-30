@@ -31,6 +31,18 @@ Pruebas focalizadas:
 docker compose exec -T app php artisan test --filter='(HomePageTest|ServicesCatalogTest|ProviderLandingHeroTest)'
 ```
 
+## Producción
+
+El entorno de demostración está desplegado en
+`https://nuevo.kconecta.com`, mediante Dokploy y el `Dockerfile` del proyecto.
+Laravel y MySQL son servicios independientes; MySQL sólo está disponible en la
+red interna de Dokploy.
+
+La configuración, restauración de datos y medios, comprobaciones posteriores al
+deploy e incidencias conocidas están en
+[`docs/deployment-dokploy.md`](./docs/deployment-dokploy.md). No guardar claves,
+contraseñas ni copias de seguridad en el repositorio.
+
 ## Datos y arquitectura
 
 La aplicación web Laravel consulta MySQL directamente mediante sus modelos y
@@ -69,8 +81,12 @@ El modelo de búsqueda de profesionales utiliza:
 - Ejemplo: `/result/services?mode=1&sti[]=23`
 - Conserva la consulta real contra MySQL y presenta la nueva interfaz de
   resultados.
-- Búsqueda de texto, favoritos y filtros visuales se limitan al front actual;
-  las acciones que requieran una decisión funcional quedan pendientes de auditoría.
+- Cada tarjeta abre el perfil público del proveedor; **Contactar** es la única
+  acción visible y abre WhatsApp cuando existe un teléfono válido.
+- El icono de filtros abre una hoja inferior. Búsqueda, orden y umbrales
+  autorizados conservan los parámetros de la consulta real.
+- Los favoritos siguen siendo una interacción visual pendiente de auditoría
+  funcional.
 - Las imágenes mostradas son la portada registrada de cada proveedor cuando está
   disponible y es WebP.
 

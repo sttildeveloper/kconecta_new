@@ -1,6 +1,6 @@
 # Contexto de trabajo — Kconecta New
 
-Actualizado: 25 de octubre de 2026.
+Actualizado: 30 de octubre de 2026.
 
 ## Misión de esta fase
 
@@ -16,6 +16,19 @@ disponibles en la base local.
 - Datos locales: MySQL `kconecta_new`
 - Datos de referencia clonados desde: `kconecta_schema`
 - La web Laravel consulta MySQL directamente. La API es exclusiva de la app móvil.
+
+## Despliegue de demostración
+
+- URL: `https://nuevo.kconecta.com`.
+- Plataforma: Dokploy en el VPS de Hostinger, con certificado Let's Encrypt.
+- Aplicación: servicio `web` construido con `Dockerfile` y puerto interno 80.
+- Datos: MySQL 8 en el servicio `mysql`, esquema `kconecta_new`, accesible sólo
+  desde la red interna de Dokploy.
+- Medios persistentes: volúmenes independientes para `img/uploads`,
+  `video/uploads` e `img/photo_profile`.
+- Operación y recuperación: consultar
+  [`docs/deployment-dokploy.md`](./docs/deployment-dokploy.md). Nunca documentar
+  contraseñas, claves ni contenido de copias de seguridad en este archivo.
 
 ## Estado funcional relevante
 
