@@ -99,3 +99,9 @@ Agregar aquí, para cada nueva fase:
 - Ruta: `/` y catálogo de servicios.
 - Alcance: normalización en presentación de los signos `?` heredados en `service_type.name`.
 - Sin cambios de esquema ni datos: los identificadores y relaciones con `provider_services` permanecen intactos.
+
+## Auditoría visual pendiente — navegación en perfil público (30 de octubre de 2026)
+
+- Ruta: `/result_provider/{id}`.
+- Cambio visual: se incorporan en `site-navbar.css` los estilos compartidos de la cabecera, que estaban definidos solo en la hoja de inicio. Esto evita que el logotipo aparezca a tamaño natural y que los enlaces de navegación se muestren sin formato en las fichas de proveedor.
+- Comportamiento: no modifica consultas, datos ni enlaces de navegación; queda pendiente de revisión visual manual en escritorio y móvil.
