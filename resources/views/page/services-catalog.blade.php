@@ -43,6 +43,10 @@
                     </a>
                 @endforeach
             </div>
+            <a class="other-services-link" href="{{ url('/result/services') }}?mode=1&amp;other_services=1" data-other-services-link>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>
+                <span>Otros servicios</span>
+            </a>
         </section>
     </section>
 

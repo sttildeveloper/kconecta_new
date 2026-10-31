@@ -78,6 +78,13 @@ Agregar aquí, para cada nueva fase:
 - comportamiento que se habilita o se deja pendiente;
 - pruebas realizadas y resultado.
 
+## Funcionalidad autorizada — acceso a otros servicios (31 de octubre de 2026)
+
+- Ruta: `/result/services`.
+- Datos reales: `service_type.id` y `provider_services`.
+- Comportamiento: el catálogo muestra, bajo las doce categorías destacadas del hogar, el acceso “Otros servicios”. Este conserva la ubicación temporal elegida y muestra proveedores vinculados a al menos una categoría que no pertenece a esas doce; por ejemplo, Abogacía. No incluye perfiles sin servicios vinculados.
+- Sin cambios de esquema ni datos. Pendiente: revisión visual manual en escritorio y móvil.
+
 ## Auditoría funcional — búsqueda de proveedores (26 de octubre de 2026)
 
 - Objetivo: hacer funcional la búsqueda de la interfaz de resultados sin cambiar el esquema ni los datos.

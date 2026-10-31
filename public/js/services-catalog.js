@@ -23,6 +23,15 @@
         if (typeId) card.href = resultUrlFor(typeId);
     });
 
+    const otherServicesLink = document.querySelector('[data-other-services-link]');
+    if (otherServicesLink) {
+        const query = new URLSearchParams({ mode: '1', other_services: '1' });
+        ['latitude', 'longitude', 'city', 'province', 'address', 'zoom'].forEach((key) => {
+            if (savedLocation[key]) query.set(key, savedLocation[key]);
+        });
+        otherServicesLink.href = `${window.location.pathname}?${query.toString()}`;
+    }
+
     const selectedCard = cardsByService
         .find((card) => card.dataset.serviceKey === selectedService);
 

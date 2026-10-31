@@ -78,6 +78,22 @@ class ProviderServiceTypeService
             ->all();
     }
 
+    public function providerIdsForServicesOutsideTypeIds(array $serviceTypeIds): array
+    {
+        $normalizedTypeIds = $this->normalizedTypeIds($serviceTypeIds);
+
+        return ProviderService::query()
+            ->when(
+                ! empty($normalizedTypeIds),
+                fn ($query) => $query->whereNotIn('service_type_id', $normalizedTypeIds)
+            )
+            ->pluck('provider_id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function syncForProvider(int $providerId, array $serviceTypeIds): void
     {
         $normalizedTypeIds = $this->normalizedTypeIds($serviceTypeIds);

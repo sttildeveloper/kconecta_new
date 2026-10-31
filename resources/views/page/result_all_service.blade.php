@@ -21,7 +21,7 @@
         ]);
     };
     $selectedTypes = collect($service_type)->filter(fn ($type) => in_array((int) ($type['id'] ?? 0), $sti ?? [], true));
-    $resultTitle = $fixLegacyText($selectedTypes->pluck('name')->filter()->implode(', ') ?: 'Servicios');
+    $resultTitle = $fixLegacyText($selectedTypes->pluck('name')->filter()->implode(', ') ?: ($showOtherServices ? 'Otros servicios' : 'Servicios'));
     $resultLabel = mb_strtoupper($resultTitle);
     $paginationQuery = request()->query();
     $portraitAssets = [

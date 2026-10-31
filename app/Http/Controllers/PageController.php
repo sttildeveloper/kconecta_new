@@ -481,7 +481,7 @@ class PageController extends Controller
 
         $request = request();
 
-        if (! $request->hasAny(['sti', 'q', 'address', 'city', 'province', 'latitude', 'longitude'])) {
+        if (! $request->hasAny(['sti', 'q', 'address', 'city', 'province', 'latitude', 'longitude', 'other_services'])) {
             return view('page.services-catalog', [
                 'categories' => $this->homeServiceCategories(),
             ]);
@@ -512,15 +512,24 @@ class PageController extends Controller
 
         $providerIdsForTypes = [];
         $hasServiceTypeFilter = $sti !== [];
+        $showOtherServices = $request->boolean('other_services');
+        $providerServiceTypes = app(ProviderServiceTypeService::class);
 
         if ($hasServiceTypeFilter) {
-            $providerIdsForTypes = app(ProviderServiceTypeService::class)->providerIdsForTypeIds($sti);
+            $providerIdsForTypes = $providerServiceTypes->providerIdsForTypeIds($sti);
+        } elseif ($showOtherServices) {
+            $highlightedTypeIds = collect($this->homeServiceCategories())
+                ->pluck('id')
+                ->filter()
+                ->map(fn ($id) => (int) $id)
+                ->all();
+            $providerIdsForTypes = $providerServiceTypes->providerIdsForServicesOutsideTypeIds($highlightedTypeIds);
         }
 
         $providersQuery = User::query()
             ->where('user_level_id', User::LEVEL_SERVICE_PROVIDER)
             ->where(fn ($query) => $query->whereNull('email')->orWhere('email', 'not like', 'deleted+%'));
-        if ($hasServiceTypeFilter) {
+        if ($hasServiceTypeFilter || $showOtherServices) {
             if (! empty($providerIdsForTypes)) {
                 $providersQuery->whereIn('id', $providerIdsForTypes);
             } else {
@@ -816,6 +825,7 @@ class PageController extends Controller
             'longitude' => $longitude,
             'zoom' => $zoom,
             'sti' => $sti,
+            'showOtherServices' => $showOtherServices,
         ]);
     }
 
