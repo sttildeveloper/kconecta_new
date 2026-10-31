@@ -11,7 +11,7 @@
 <main id="contenido-principal" class="kc-page">
     <section class="kc-home" aria-labelledby="home-title">
         <div class="kc-home__shell">
-            <h1 id="home-title">Encuentra el servicio que<br>necesitas</h1>
+            <h1 id="home-title">Encuentra el servicio que <br>necesitas</h1>
             <div class="kc-action-grid">
                 <form class="kc-tile kc-tile--location" action="{{ url('/result/services') }}" method="get" data-home-search data-home-catalog-url="{{ url('/result/services') }}">
                     <input type="hidden" name="mode" value="2"><input type="hidden" name="latitude" value="" data-home-latitude><input type="hidden" name="longitude" value="" data-home-longitude><input type="hidden" name="city" value="" data-home-city><input type="hidden" name="province" value="" data-home-province><input type="hidden" name="zoom" value="13" data-home-zoom>

@@ -23,6 +23,7 @@ class HomePageTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Encuentra el servicio que')
+            ->assertSee('que <br>necesitas', false)
             ->assertSee('Usar mi ubicación')
             ->assertSee('Escribir dirección en este lugar')
             ->assertSee('Servicios para el hogar')
