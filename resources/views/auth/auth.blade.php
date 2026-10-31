@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="{{ asset('css/page/login.css') }}">
         <link rel="stylesheet" href="{{ asset('css/components/legal-acceptance.css') }}?v={{ filemtime(public_path('css/components/legal-acceptance.css')) }}">
         <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
-        <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+        @include('layouts.partials.favicon')
     </head>
     <body>
         @if ($errors->any() || session('status'))

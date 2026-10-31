@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Kconecta - Verifica tu correo</title>
-        <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+        @include('layouts.partials.favicon')
         <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
         <style>
             body {

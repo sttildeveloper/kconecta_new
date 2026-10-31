@@ -43,12 +43,14 @@ class KconectaBrandAssetsTest extends TestCase
     {
         $this->assertFileExists(public_path('favicon.ico'));
         $this->assertFileExists(public_path('favicon.png'));
+        $this->assertFileExists(public_path('apple-touch-icon.png'));
         $this->assertFileExists(public_path('favicon.webp'));
         $this->assertFileExists(public_path('img/kconecta-map-marker.png'));
 
         $this->get('/')
             ->assertOk()
             ->assertSee(asset('favicon.png'), false)
+            ->assertSee(asset('apple-touch-icon.png'), false)
             ->assertDontSee('img/ico.png', false);
     }
 }

@@ -6,7 +6,7 @@
         <title>@yield('title', $title ?? 'Kconecta')</title>
         <link rel="stylesheet" href="{{ asset('css/page/dashboard.css') }}">
         <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
-        <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+        @include('layouts.partials.favicon')
         @yield('styles')
     </head>
     <body>

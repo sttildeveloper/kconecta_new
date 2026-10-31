@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#82d1f3">
     <title>Servicios para el hogar | Kconecta</title>
+    @include('layouts.partials.favicon')
     <link rel="stylesheet" href="{{ asset('css/page/services-catalog.css') }}">
 </head>
 <body>

@@ -38,6 +38,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#82d1f3">
     <title>Resultados: {{ $resultTitle }} | Kconecta</title>
+    @include('layouts.partials.favicon')
     <link rel="stylesheet" href="{{ asset('css/page/results-ui.css') }}?v={{ filemtime(public_path('css/page/results-ui.css')) }}">
 </head>
 <body>

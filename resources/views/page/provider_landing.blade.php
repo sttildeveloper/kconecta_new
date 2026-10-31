@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#82d1f3">
     <title>Brindo servicios | Kconecta</title>
+    @include('layouts.partials.favicon')
     <meta name="description" content="Inscripción gratuita para profesionales en Kconecta.">
     <link rel="stylesheet" href="{{ asset('css/page/provider-onboarding.css') }}">
     <link rel="stylesheet" href="{{ asset('css/page/provider-registration.css') }}?v={{ filemtime(public_path('css/page/provider-registration.css')) }}">

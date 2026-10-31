@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Legal' }} - {{ $legalConfig['brand_name'] ?? 'Kconecta' }}</title>
+    @include('layouts.partials.favicon')
     <link rel="stylesheet" href="{{ asset('css/legal.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components/site-navbar.css') }}?v={{ filemtime(public_path('css/components/site-navbar.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
