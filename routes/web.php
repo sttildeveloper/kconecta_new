@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class, 'index'])->name('home');
 Route::get('/quiero-ser-proveedor', [PageController::class, 'providerLanding'])->name('provider.landing');
+Route::post('/quiero-ser-proveedor', [PageController::class, 'registerProviderLanding'])
+    ->middleware('throttle:5,1')
+    ->name('provider.register');
 Route::get('/result', [PageController::class, 'resultAll']);
 Route::get('/result/services', [PageController::class, 'resultAllServices']);
 Route::get('/result_maps', [PageController::class, 'resultMaps']);

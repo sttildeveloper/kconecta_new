@@ -1,0 +1,7 @@
+.provider-registration-form .provider-field { display:flex; align-items:center; gap:10px; min-height:54px; height:auto; padding:0 15px; border:2px solid #d2d4d9; border-radius:27px; color:#263440; font-size:21px; }
+.provider-registration-form .provider-field input, .provider-registration-form .provider-field select { width:100%; min-width:0; border:0; outline:0; color:#263440; background:transparent; font-size:17px; }
+.provider-registration-form .provider-field select { appearance:auto; cursor:pointer; }
+.provider-registration-form .legal-acceptance { margin:5px 0; }
+.provider-registration-honeypot { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+.provider-registration-errors { padding:12px 16px; border-radius:16px; color:#842029; background:#f8d7da; font-size:14px; }
+.provider-registration-errors ul { margin:0; padding-left:18px; }

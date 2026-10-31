@@ -50,12 +50,15 @@ use App\Models\WheeledAccess;
 use App\Services\ProviderLocationSearchService;
 use App\Services\ProviderServiceTypeService;
 use App\Services\ServiceRatingService;
+use App\Services\UserRegistrationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class PageController extends Controller
 {
@@ -254,7 +257,86 @@ class PageController extends Controller
 
     public function providerLanding()
     {
-        return view('page.provider_landing');
+        $registrationFormStartedAt = now()->timestamp;
+        session(['provider_landing_registration_started_at' => $registrationFormStartedAt]);
+
+        return view('page.provider_landing', [
+            'serviceTypes' => ServiceType::query()
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (ServiceType $type) => [
+                    'id' => (int) $type->id,
+                    'name' => $this->displayServiceTypeName((string) $type->name),
+                ]),
+            'registrationFormStartedAt' => $registrationFormStartedAt,
+        ]);
+    }
+
+    public function registerProviderLanding(Request $request, UserRegistrationService $registrationService)
+    {
+        $this->ensureHumanProviderRegistrationAttempt($request);
+
+        $legalVersions = [
+            'terms' => (string) config('compliance.legal_acceptance.documents.terms', '1.0'),
+            'privacy' => (string) config('compliance.legal_acceptance.documents.privacy', '1.0'),
+        ];
+        $request->validate([
+            'service_type_id' => ['required', 'integer', Rule::exists('service_type', 'id')],
+            'terms_accepted' => ['required', 'accepted'],
+            'privacy_acknowledged' => ['required', 'accepted'],
+            'legal_terms_version' => ['required', Rule::in([$legalVersions['terms']])],
+            'legal_privacy_version' => ['required', Rule::in([$legalVersions['privacy']])],
+        ]);
+
+        $payload = $request->all();
+        $payload['user_level_id'] = User::LEVEL_SERVICE_PROVIDER;
+        $payload['legal_acceptances'] = [
+            ['type' => 'terms', 'version' => $legalVersions['terms']],
+            ['type' => 'privacy', 'version' => $legalVersions['privacy']],
+        ];
+        $validated = $registrationService->validate($payload, User::LEVEL_SERVICE_PROVIDER);
+
+        $provider = DB::transaction(function () use ($registrationService, $validated, $request) {
+            $provider = $registrationService->register($validated + [
+                '_acceptance_ip' => $request->ip(),
+                '_acceptance_user_agent' => $request->userAgent(),
+            ]);
+
+            app(ProviderServiceTypeService::class)->syncForProvider(
+                (int) $provider->id,
+                [(int) $request->integer('service_type_id')]
+            );
+
+            return $provider;
+        });
+
+        Auth::login($provider);
+
+        return redirect()->route('verification.notice');
+    }
+
+    private function ensureHumanProviderRegistrationAttempt(Request $request): void
+    {
+        if (filled((string) $request->input('website'))) {
+            throw ValidationException::withMessages([
+                'email' => 'No se pudo procesar el registro. Inténtalo de nuevo.',
+            ]);
+        }
+
+        $submittedStartedAt = (int) $request->input('registration_form_started_at');
+        $sessionStartedAt = (int) $request->session()->pull('provider_landing_registration_started_at', 0);
+
+        if ($submittedStartedAt <= 0 || $sessionStartedAt <= 0 || $submittedStartedAt !== $sessionStartedAt) {
+            throw ValidationException::withMessages([
+                'email' => 'La sesión del formulario ha caducado. Recarga la página e inténtalo de nuevo.',
+            ]);
+        }
+
+        if ((now()->timestamp - $sessionStartedAt) < 3) {
+            throw ValidationException::withMessages([
+                'email' => 'Espera unos segundos antes de enviar el formulario.',
+            ]);
+        }
     }
 
     public function resultAll()

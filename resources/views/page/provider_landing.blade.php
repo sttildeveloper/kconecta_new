@@ -7,6 +7,8 @@
     <title>Brindo servicios | Kconecta</title>
     <meta name="description" content="Inscripción gratuita para profesionales en Kconecta.">
     <link rel="stylesheet" href="{{ asset('css/page/provider-onboarding.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/page/provider-registration.css') }}?v={{ filemtime(public_path('css/page/provider-registration.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/components/legal-acceptance.css') }}?v={{ filemtime(public_path('css/components/legal-acceptance.css')) }}">
 </head>
 <body>
 <main class="provider-page">
@@ -37,13 +39,24 @@
                 </section>
 
                 <section class="provider-panel provider-form-panel" aria-labelledby="register-title">
-                    <h2 id="register-title">Registro gratuito <span>(demostración)</span></h2>
-                    <form data-provider-demo-form>
-                        <label><span aria-hidden="true">♙</span><span class="sr-only">Nombre comercial</span><input type="text" placeholder="Nombre comercial" autocomplete="organization"></label>
-                        <label><span aria-hidden="true">⚒</span><span class="sr-only">Servicio que ofreces</span><input type="text" placeholder="Servicio que ofreces" autocomplete="off"></label>
-                        <label><span aria-hidden="true">✉</span><span class="sr-only">Correo electrónico</span><input type="email" placeholder="Correo electrónico" autocomplete="email"></label>
+                    <h2 id="register-title">Registro gratuito</h2>
+                    @if ($errors->any())
+                        <div class="provider-registration-errors" role="alert"><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
+                    @endif
+                    <form method="POST" action="{{ route('provider.register') }}" class="provider-registration-form">
+                        @csrf
+                        <input type="hidden" name="registration_form_started_at" value="{{ $registrationFormStartedAt }}">
+                        <input type="hidden" name="document_type" value="">
+                        <input type="hidden" name="document_number" value="">
+                        <div class="provider-registration-honeypot" aria-hidden="true"><label for="provider-website">Sitio web</label><input id="provider-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+                        <label class="provider-field"><span aria-hidden="true">♙</span><span class="sr-only">Nombre comercial</span><input name="company_name" type="text" value="{{ old('company_name') }}" placeholder="Nombre comercial" autocomplete="organization" required></label>
+                        <label class="provider-field"><span aria-hidden="true">⚒</span><span class="sr-only">Servicio que ofreces</span><select name="service_type_id" required><option value="">Servicio que ofreces</option>@foreach ($serviceTypes as $serviceType)<option value="{{ $serviceType['id'] }}" @selected((string) old('service_type_id') === (string) $serviceType['id'])>{{ $serviceType['name'] }}</option>@endforeach</select></label>
+                        <label class="provider-field"><span aria-hidden="true">✉</span><span class="sr-only">Correo electrónico</span><input name="email" type="email" value="{{ old('email') }}" placeholder="Correo electrónico" autocomplete="email" required></label>
+                        <label class="provider-field"><span aria-hidden="true">●</span><span class="sr-only">Contraseña</span><input name="password" type="password" placeholder="Contraseña (mínimo 6 caracteres)" autocomplete="new-password" required></label>
+                        <label class="provider-field"><span aria-hidden="true">●</span><span class="sr-only">Repite la contraseña</span><input name="password_confirmation" type="password" placeholder="Repite la contraseña" autocomplete="new-password" required></label>
+                        @include('auth.partials.legal-acceptance', ['legalCheckboxPrefix' => 'provider-landing'])
                         <button type="submit">Inscribirme gratis</button>
-                        <p class="provider-form-note" data-provider-demo-status>Formulario demostrativo, no conectado a ningún servicio.</p>
+                        <p class="provider-form-note">Te enviaremos un correo para verificar tu cuenta.</p>
                     </form>
                 </section>
             </div>
@@ -61,6 +74,5 @@
         </div>
     </section>
 </main>
-<script src="{{ asset('js/provider-onboarding.js') }}" defer></script>
 </body>
 </html>

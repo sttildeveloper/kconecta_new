@@ -1,6 +1,6 @@
 # Contexto de trabajo — Kconecta New
 
-Actualizado: 30 de octubre de 2026.
+Actualizado: 31 de octubre de 2026.
 
 ## Misión de esta fase
 
@@ -138,3 +138,26 @@ Agregar aquí, para cada nueva fase:
 - Ruta: `/`.
 - Cambio visual: se reduce el espaciado negativo del titular en pantallas de hasta 680 px y se añade separación entre palabras para que “que necesitas” no se perciba como una sola palabra.
 - Comportamiento: no modifica enlaces, búsqueda ni datos; queda pendiente de comprobación visual manual en móvil.
+
+## Cierre de sesión — 31 de octubre de 2026
+
+- Catálogo: se añadió el acceso centrado “Otros servicios” bajo las doce categorías destacadas. Usa el recurso aprobado `public/img/kconecta/otros-servicios.svg`, mantiene la ubicación temporal y consulta proveedores vinculados en `provider_services` a categorías no destacadas; por ejemplo, Abogacía.
+- Inicio: la llamada a acción para proveedores se actualizó a “Ofrezco servicios”, con el texto “Eres un profesional o manitas” e “Inscríbete gratuitamente y gana visibilidad”.
+- Inicio móvil: se corrigió el espacio semántico entre “que” y “necesitas” al ocultarse el salto de línea móvil. El ajuste visual continúa pendiente de validación manual en un dispositivo móvil.
+- Pruebas ejecutadas: `ServicesCatalogTest` (4 pruebas) y `HomePageTest` (4 pruebas) correctas durante esta sesión.
+
+## Fase realizada — activar el registro de proveedores
+
+- Objetivo: hacer funcional y probar el formulario de `/quiero-ser-proveedor`, anteriormente demostrativo y sin transmisión de datos.
+- Referencia obligatoria: revisar primero el flujo equivalente en `C:\MeegDev\kconecta-crm\web`, incluyendo rutas, controlador, validación, alta de usuario/proveedor, servicio seleccionado, verificación de correo y manejo de duplicados.
+- Alcance esperado: adaptar únicamente el flujo web a `kconecta_new`, usando su base MySQL local y sin incorporar la API móvil ni tocar la base de referencia.
+- Antes de implementar: documentar en este archivo el contrato de campos, tablas reales, reglas de negocio heredadas, riesgos de seguridad y pruebas de integración acordadas.
+- Validación realizada: envío válido, categoría inexistente, aceptación legal, correo duplicado, asignación del nivel de proveedor, persistencia de `provider_services`, creación de `user_address` y redirección al aviso de verificación de correo.
+
+## Funcionalidad autorizada — registro web de proveedores (31 de octubre de 2026)
+
+- Referencia revisada: `C:\MeegDev\kconecta-crm\web` usa `RegisteredUserController` y `UserRegistrationService` para alta, validación de duplicados, aceptación legal, creación de `user` y `user_address`, evento de verificación de correo e inicio de sesión.
+- Ruta: `GET` y `POST /quiero-ser-proveedor`; el formulario público conserva nombre comercial, categoría, correo y añade contraseña, confirmación y aceptación de documentos legales obligatorios.
+- Datos reales: `user` con `user_level_id = 4`, `user_address`, `service_type` y `provider_services`. La categoría elegida se guarda mediante `provider_services`; no se usa la API móvil.
+- Seguridad y reglas: límite de envíos, campo trampa, tiempo mínimo de cumplimentación, CSRF, contraseña confirmada, comprobación de correo y razón social duplicados, y versiones vigentes de términos y privacidad.
+- Resultado esperado: tras el alta se inicia sesión y se dirige al aviso de verificación de correo; el proveedor no se muestra como perfil verificable hasta completar ese flujo. Las pruebas cubren alta válida, relación de categoría, duplicados y validación de campos.
