@@ -62,6 +62,10 @@ class HomePageTest extends TestCase
         $this->assertIsString($css);
         $this->assertStringContainsString('--kc-sky:#8bd6fa', $css);
         $this->assertStringContainsString('@media(max-width:680px)', $css);
+
+        $mobileCss = file_get_contents(public_path('css/page/home-mobile.css'));
+        $this->assertIsString($mobileCss);
+        $this->assertStringContainsString('word-spacing: 0.06em', $mobileCss);
     }
 
     public function test_geolocation_is_requested_only_after_the_explicit_action(): void

@@ -132,3 +132,9 @@ Agregar aquí, para cada nueva fase:
 - Referencia: propuesta visual aprobada de resultados y hoja inferior de filtros.
 - Cambio visual: se elimina la acción visible “Ver perfil”; toda la tarjeta del proveedor abre su perfil, excepto sus controles propios. “Contactar” continúa siendo la única acción visible. Los filtros dejan de ocupar espacio en la lista y se muestran en una hoja inferior al pulsar el icono de filtros.
 - Comportamiento: se conservan la búsqueda, la consulta real de proveedores, los parámetros de orden y los umbrales de valoración ya autorizados. La hoja permite ajustar valores y aplicarlos explícitamente con “Ver resultados”; queda pendiente la comprobación visual manual en escritorio y móvil.
+
+## Auditoría visual pendiente — titular de inicio en móvil (31 de octubre de 2026)
+
+- Ruta: `/`.
+- Cambio visual: se reduce el espaciado negativo del titular en pantallas de hasta 680 px y se añade separación entre palabras para que “que necesitas” no se perciba como una sola palabra.
+- Comportamiento: no modifica enlaces, búsqueda ni datos; queda pendiente de comprobación visual manual en móvil.

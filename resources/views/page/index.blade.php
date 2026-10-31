@@ -1,6 +1,7 @@
 @extends('layouts.home')
 
 @section('head')
+    <link rel="stylesheet" href="{{ asset('css/page/home-mobile.css') }}?v={{ filemtime(public_path('css/page/home-mobile.css')) }}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Kconecta | Encuentra el servicio que necesitas">
     <meta property="og:description" content="Encuentra y contacta profesionales de confianza para tu hogar.">

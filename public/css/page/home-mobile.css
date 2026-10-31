@@ -1,0 +1,6 @@
+@media (max-width: 680px) {
+    .kc-home h1 {
+        letter-spacing: -0.015em;
+        word-spacing: 0.06em;
+    }
+}
