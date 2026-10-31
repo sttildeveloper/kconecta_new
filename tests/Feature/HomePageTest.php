@@ -27,7 +27,7 @@ class HomePageTest extends TestCase
             ->assertSee('Escribir dirección en este lugar')
             ->assertSee('Servicios para el hogar')
             ->assertSee('Ofrezco servicios')
-            ->assertSee('Eres un profesional o Manitas')
+            ->assertSee('Eres un profesional o manitas')
             ->assertSee('Inscríbete gratuitamente y gana visibilidad')
             ->assertSee('Inmobiliaria')
             ->assertSee('img/kconecta/kconecta_logo.webp')
