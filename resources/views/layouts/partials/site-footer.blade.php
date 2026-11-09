@@ -2,7 +2,7 @@
     <div class="site-footer__shell site-footer__grid">
         <div class="site-footer__about">
             <a class="site-footer__brand" href="{{ route('home') }}" aria-label="Kconecta, inicio">
-                <img src="{{ asset('img/kconecta/kconecta_icon.webp') }}" alt="Kconecta" width="96" height="82">
+                <img src="{{ asset('img/kconecta_icon.webp') }}" alt="Kconecta" width="96" height="82">
             </a>
             <p>Encuentra servicios para tu hogar y conecta con profesionales de forma sencilla.</p>
         </div>

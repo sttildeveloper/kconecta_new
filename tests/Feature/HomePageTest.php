@@ -35,7 +35,7 @@ class HomePageTest extends TestCase
             ->assertSee('Kconecta te ayuda a encontrar servicios para el hogar de forma clara, rápida y visual.')
             ->assertDontSee('Prototipo ilustrativo', false)
             ->assertSee('Inmobiliaria')
-            ->assertSee('img/kconecta/kconecta_icon.webp')
+            ->assertSee('img/kconecta_icon.webp')
             ->assertSee('img/kconecta/map.webp')
             ->assertSee('Fontanería')
             ->assertSee('Albañilería')

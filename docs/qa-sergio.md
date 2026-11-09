@@ -120,6 +120,8 @@ Resultado: **196 pruebas correctas, 9 fallidas y 1.332 aserciones**
 - **Aplicado:** el logotipo nuevo WebP se usa en cabecera, pie, catálogo, resultados e inscripción. Se normalizan acciones al azul Kconecta `#1476e8` y los acentos suaves al celeste `#8bd6fa`; el acceso deja 48 px antes del pie.
 - **Pendiente de auditoría visual:** comprobar proporciones del logotipo nuevo y el espaciado en escritorio y móvil.
 
+> Corrección posterior: el recurso se encontraba en `public/img/`, no en la subcarpeta `img/kconecta/`; se ajustaron todas las rutas públicas. El CTA de WhatsApp de la ficha también se fija a `#1476e8`, anulando el estilo en línea anterior.
+
 ## Riesgos y límites de la revisión
 
 - La batería automática valida contratos y regresiones, pero no sustituye la

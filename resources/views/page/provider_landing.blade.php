@@ -20,7 +20,7 @@
 <main class="provider-page">
     <header class="provider-topbar" aria-label="Navegación de inscripción">
         <a class="provider-back" href="{{ url('/') }}" aria-label="Volver al inicio">‹</a>
-        <img src="{{ asset('img/kconecta/kconecta_icon.webp') }}" alt="Kconecta" class="provider-logo">
+        <img src="{{ asset('img/kconecta_icon.webp') }}" alt="Kconecta" class="provider-logo">
         <p class="provider-location"><span aria-hidden="true">⌖</span><strong>Tu perfil</strong><small>Registro de profesional</small></p>
     </header>
 

@@ -33,8 +33,8 @@
         .provider-services-card .service-item .service-links a { display: inline-flex; align-items: center; gap: .35rem; padding: .38rem .72rem; border-radius: 999px; border: 1px solid var(--details-border); color: var(--details-accent); font-weight: 700; font-size: .82rem; text-decoration: none; }
         .provider-sidebar-links { display: grid; gap: .5rem; width: 100%; margin-top: .8rem; }
         .provider-sidebar-links a { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; min-height: 40px; border-radius: 10px; border: 1px solid var(--details-border); color: var(--details-accent); font-weight: 700; background: #fff; text-decoration: none; }
-        .provider-sidebar-links a.primary { background: #4bb7c6; color: #fff; border-color: transparent; }
-        .provider-sidebar-links a.secondary { background: #123f6e; color: #fff; border-color: transparent; }
+        .provider-sidebar-links a.primary { background: #1476e8; color: #fff; border-color: transparent; }
+        .provider-sidebar-links a.secondary { background: #0f63c7; color: #fff; border-color: transparent; }
         @media screen and (max-width: 700px) {
             .provider-summary-grid { grid-template-columns: minmax(0, 1fr); }
         }

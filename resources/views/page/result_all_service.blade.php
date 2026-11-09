@@ -50,7 +50,7 @@
 <main class="results-page">
     <header class="results-topbar" aria-label="Navegación de resultados">
         <a class="results-back" href="{{ url('/result/services') }}" aria-label="Volver a los servicios">‹</a>
-        <img src="{{ asset('img/kconecta/kconecta_icon.webp') }}" alt="Kconecta" class="results-logo">
+        <img src="{{ asset('img/kconecta_icon.webp') }}" alt="Kconecta" class="results-logo">
         <p class="results-location"><span aria-hidden="true">⌖</span><strong>{{ $city ?: 'Ubicación' }}</strong><small>{{ $city ? 'ubicación indicada' : 'sin ubicación indicada' }}</small></p>
     </header>
 
