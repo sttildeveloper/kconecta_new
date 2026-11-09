@@ -40,8 +40,8 @@ class SharedFooterTest extends TestCase
             $this->get($url)
                 ->assertOk()
                 ->assertSee('class="site-footer"', false)
-                ->assertSee('La forma más sencilla de encontrar profesionales de confianza para tu hogar.')
-                ->assertSee('Eliminación de cuenta');
+                ->assertSee('Encuentra servicios para tu hogar y conecta con profesionales de forma sencilla.')
+                ->assertSee('Configurar cookies');
         }
     }
 }

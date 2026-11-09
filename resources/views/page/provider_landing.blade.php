@@ -10,13 +10,14 @@
     <link rel="stylesheet" href="{{ asset('css/page/provider-onboarding.css') }}">
     <link rel="stylesheet" href="{{ asset('css/page/provider-registration.css') }}?v={{ filemtime(public_path('css/page/provider-registration.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/components/legal-acceptance.css') }}?v={{ filemtime(public_path('css/components/legal-acceptance.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
 </head>
 <body>
 <main class="provider-page">
     <header class="provider-topbar" aria-label="Navegación de inscripción">
         <a class="provider-back" href="{{ url('/') }}" aria-label="Volver al inicio">‹</a>
         <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta" class="provider-logo">
-        <p class="provider-location"><span aria-hidden="true">⌖</span><strong>Barcelona</strong><small>(08028) demo</small></p>
+        <p class="provider-location"><span aria-hidden="true">⌖</span><strong>Tu perfil</strong><small>Registro de profesional</small></p>
     </header>
 
     <section class="provider-content" aria-labelledby="provider-title">
@@ -63,9 +64,9 @@
             </div>
 
             <aside class="provider-preview" aria-labelledby="preview-title">
-                <p class="provider-preview__pill"><span aria-hidden="true">◉</span> Vista de ejemplo · no forma parte del formulario</p>
+                <p class="provider-preview__pill"><span aria-hidden="true">◉</span> Vista previa de tu perfil</p>
                 <h2 id="preview-title">Así completarías tu perfil después</h2>
-                <p>Estos pasos se definirán en una fase posterior y están pendientes de aprobación.</p>
+                <p>Completa esta información para mostrar mejor tus servicios.</p>
                 <ul>
                     <li><span aria-hidden="true">♙</span><div><strong>Perfil profesional</strong><small>Foto, descripción y especialidades</small></div></li>
                     <li><span aria-hidden="true">⚒</span><div><strong>Servicios</strong><small>Lista de trabajos que realizas</small></div></li>
@@ -75,5 +76,7 @@
         </div>
     </section>
 </main>
+@include('layouts.partials.site-footer')
+<script src="{{ asset('js/cookie_config.js') }}"></script>
 </body>
 </html>

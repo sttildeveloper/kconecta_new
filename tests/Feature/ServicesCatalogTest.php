@@ -47,7 +47,7 @@ class ServicesCatalogTest extends TestCase
             ->assertViewIs('page.services-catalog')
             ->assertSee('data-service-key="lampista"', false)
             ->assertSee('data-service-id=', false)
-            ->assertSee('demo-lampista-1.webp');
+            ->assertDontSee('demostración', false);
 
         $javascript = file_get_contents(public_path('js/services-catalog.js'));
         $this->assertIsString($javascript);

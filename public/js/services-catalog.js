@@ -1,7 +1,5 @@
 (() => {
     const catalog = document.querySelector('.services-content');
-    const results = document.querySelector('[data-service-results]');
-    const topBack = document.querySelector('.services-back');
     const selectedService = new URLSearchParams(window.location.search).get('service');
     const localTypeIds = { reformas: 23 };
     const storageKey = 'kconectaSearchLocation';
@@ -40,14 +38,6 @@
         return;
     }
 
-    if (selectedService === 'lampista' && catalog && results) {
-        catalog.hidden = true;
-        results.hidden = false;
-        topBack.href = window.location.pathname;
-        topBack.setAttribute('aria-label', 'Volver a los servicios');
-        document.title = 'Resultados: Lampista | Kconecta';
-    }
-
     const catalogForm = document.querySelector('[data-services-search]');
     const catalogInput = document.querySelector('[data-services-query]');
     const catalogCards = cardsByService;
@@ -72,35 +62,4 @@
         });
     }
 
-    const resultForm = document.querySelector('[data-results-search]');
-    const resultInput = document.querySelector('#professional-query');
-    const professionals = [...document.querySelectorAll('[data-professional-card]')];
-    const count = document.querySelector('[data-results-count]');
-    const resultStatus = document.querySelector('[data-results-status]');
-    const updateProfessionals = () => {
-        if (!resultInput) return;
-        const query = normalise(resultInput.value);
-        const visible = professionals.filter((card) => {
-            const matches = !query || normalise(card.dataset.professionalName || '').includes(query);
-            card.hidden = !matches;
-            return matches;
-        }).length;
-        if (count) count.textContent = visible;
-        if (resultStatus) resultStatus.textContent = `${visible} profesionales de demostración mostrados.`;
-    };
-    resultInput?.addEventListener('input', updateProfessionals);
-    resultForm?.addEventListener('submit', (event) => { event.preventDefault(); updateProfessionals(); });
-
-    document.querySelectorAll('[data-demo-filter]').forEach((button) => button.addEventListener('click', () => {
-        button.parentElement.querySelectorAll('button').forEach((item) => item.classList.remove('is-active'));
-        button.classList.add('is-active');
-    }));
-    document.querySelectorAll('[data-demo-favorite]').forEach((button) => button.addEventListener('click', () => {
-        const active = button.classList.toggle('is-active');
-        button.textContent = active ? '♥' : '♡';
-        button.setAttribute('aria-pressed', String(active));
-    }));
-    document.querySelectorAll('[data-demo-contact], [data-demo-profile]').forEach((button) => button.addEventListener('click', () => {
-        if (resultStatus) resultStatus.textContent = 'Acción no disponible: es una interfaz de demostración.';
-    }));
 })();

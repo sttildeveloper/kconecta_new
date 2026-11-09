@@ -40,13 +40,14 @@
     <title>Resultados: {{ $resultTitle }} | Kconecta</title>
     @include('layouts.partials.favicon')
     <link rel="stylesheet" href="{{ asset('css/page/results-ui.css') }}?v={{ filemtime(public_path('css/page/results-ui.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
 </head>
 <body>
 <main class="results-page">
     <header class="results-topbar" aria-label="Navegación de resultados">
         <a class="results-back" href="{{ url('/result/services') }}" aria-label="Volver a los servicios">‹</a>
         <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta" class="results-logo">
-        <p class="results-location"><span aria-hidden="true">⌖</span><strong>{{ $city ?: 'Barcelona' }}</strong><small>{{ $city ? 'ubicación indicada' : '(08028) demo' }}</small></p>
+        <p class="results-location"><span aria-hidden="true">⌖</span><strong>{{ $city ?: 'Ubicación' }}</strong><small>{{ $city ? 'ubicación indicada' : 'sin ubicación indicada' }}</small></p>
     </header>
 
     <section class="results-content" aria-labelledby="results-title">
@@ -74,7 +75,6 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h3M11 17h9M14 4v6M7 14v6"/></svg>
                 </button>
                 <h2><span data-results-count>{{ count($properties) }}</span> perfiles mostrados <small>de {{ $quantity }} encontrados</small></h2>
-                <p class="results-disclaimer"><span aria-hidden="true">ⓘ</span> Los perfiles proceden de la base local. La distancia y la valoración se calculan con sus datos registrados.</p>
 
                 <div class="professional-cards">
                     @forelse ($properties as $index => $property)
@@ -107,7 +107,7 @@
                                 : null;
                         @endphp
                         <article class="professional-card" data-professional-card data-professional-name="{{ $profileName }}" data-profile-url="{{ url('/result_provider/'.data_get($property, 'id')) }}" tabindex="0" role="link" aria-label="Abrir perfil de {{ $profileName }}">
-                            <img src="{{ $portrait }}" alt="Retrato ilustrativo para {{ $profileName }}">
+                            <img src="{{ $portrait }}" alt="Imagen de perfil de {{ $profileName }}">
                             <div class="professional-card__body">
                                 <small>{{ $resultLabel }}</small>
                                 <h3>{{ $profileName }}</h3>
@@ -141,6 +141,7 @@
         </div>
     </section>
 </main>
+@include('layouts.partials.site-footer')
 <div class="results-filter-modal" id="results-filter-sheet" data-results-filter-modal aria-hidden="true">
     <button class="results-filter-backdrop" type="button" tabindex="-1" aria-label="Cerrar filtros" data-results-filter-close></button>
     <section class="results-filter-sheet" role="dialog" aria-modal="true" aria-labelledby="results-filter-title">
@@ -151,6 +152,7 @@
         <footer class="results-filter-actions"><button type="button" data-results-filter-reset>Restablecer</button><button type="button" data-results-filter-apply>Ver resultados</button></footer>
     </section>
 </div>
+<script src="{{ asset('js/cookie_config.js') }}"></script>
 <script src="{{ asset('js/results-ui.js') }}?v={{ filemtime(public_path('js/results-ui.js')) }}" defer></script>
 </body>
 </html>

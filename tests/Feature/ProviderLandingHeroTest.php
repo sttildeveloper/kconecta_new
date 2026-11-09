@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\ServiceType;
 use App\Models\User;
 use App\Models\UserAddress;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class ProviderLandingHeroTest extends TestCase
@@ -35,6 +37,7 @@ class ProviderLandingHeroTest extends TestCase
 
     public function test_provider_landing_registers_a_provider_and_selected_service_type(): void
     {
+        Notification::fake();
         $serviceType = ServiceType::query()->create(['name' => 'Abogac?a']);
         $startedAt = now()->subSeconds(4)->timestamp;
 
@@ -51,6 +54,7 @@ class ProviderLandingHeroTest extends TestCase
         ]);
         $this->assertTrue(UserAddress::query()->where('user_id', $provider->id)->exists());
         $this->assertAuthenticatedAs($provider);
+        Notification::assertSentTo($provider, VerifyEmail::class);
     }
 
     public function test_provider_landing_rejects_duplicate_email_without_creating_a_second_provider(): void
