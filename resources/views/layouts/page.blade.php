@@ -19,7 +19,7 @@
     </head>
     <body>
         <div class="loader-page-change" id="loader-page-change">
-            <img src="{{ asset('img/kconecta_icon.webp') }}" alt="Kconecta">
+            <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta">
         </div>
         @include('layouts.partials.site-navbar')
         <span id="contenido-principal"></span>

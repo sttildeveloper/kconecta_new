@@ -38,7 +38,7 @@
                     </div>
                     <div class="container-logo-image-dml-redirect-start">
                         <a href="{{ url('/') }}">
-                            <img src="{{ asset('img/kconecta_icon.webp') }}" alt="Kconecta">
+                            <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta">
                         </a>
                     </div>
                     <h1 class="title-main-section">Crea tu Cuenta</h1>
@@ -159,7 +159,7 @@
                     @csrf
                     <div class="container-logo-image-dml-redirect-start">
                         <a href="{{ url('/') }}">
-                            <img src="{{ asset('img/kconecta_icon.webp') }}" alt="Kconecta">
+                            <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta">
                         </a>
                     </div>
                     <h1 class="title-main-section">Iniciar Sesi&oacute;n</h1>

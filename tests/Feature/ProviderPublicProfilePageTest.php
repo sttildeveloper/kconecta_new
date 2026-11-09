@@ -36,6 +36,7 @@ class ProviderPublicProfilePageTest extends TestCase
 
         $this->get('/result_provider/'.$provider->id)
             ->assertOk()
+            ->assertSee('img/kconecta/kconecta_logo.webp')
             ->assertSee('Instalaciones Cataluña Aragón')
             ->assertSee('Barcelona, Barcelona, España')
             ->assertDontSee('Catalu?a', false)

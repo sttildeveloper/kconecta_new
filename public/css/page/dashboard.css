@@ -79,8 +79,8 @@ body {
 }
 
 .brand img {
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 9rem;
+  height: auto;
 }
 
 .sidebar-nav {

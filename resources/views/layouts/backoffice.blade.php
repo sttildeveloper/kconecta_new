@@ -13,8 +13,7 @@
         <div class="dashboard-shell">
             <aside class="dashboard-sidebar">
                 <div class="brand">
-                    <img src="{{ asset('img/kconecta_icon.webp') }}" alt="Kconecta">
-                    <span>Kconecta</span>
+                    <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta">
                 </div>
                 <nav class="sidebar-nav">
                     @php

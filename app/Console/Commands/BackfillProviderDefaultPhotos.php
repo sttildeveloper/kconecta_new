@@ -18,7 +18,7 @@ class BackfillProviderDefaultPhotos extends Command
 
     public function handle(): int
     {
-        $sourcePath = public_path('img/kconecta_icon.webp');
+        $sourcePath = public_path('img/kconecta/kconecta_logo.webp');
         $targetDirectory = public_path('img/photo_profile');
 
         if (! File::isFile($sourcePath) || ! File::isReadable($sourcePath)) {

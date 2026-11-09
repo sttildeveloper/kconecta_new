@@ -47,7 +47,7 @@ class BackfillProviderDefaultPhotosCommandTest extends TestCase
             $this->assertSame('existing-provider.webp', $existingPhoto->fresh()->photo);
             $this->assertFileExists($targetPath);
             $this->assertSame(
-                hash_file('sha256', public_path('img/kconecta_icon.webp')),
+                hash_file('sha256', public_path('img/kconecta/kconecta_logo.webp')),
                 hash_file('sha256', $targetPath)
             );
         } finally {
