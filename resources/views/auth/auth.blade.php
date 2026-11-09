@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Kconecta - {{ $mode === 'register' ? 'Crear cuenta' : 'Iniciar sesion' }}</title>
-        <link rel="stylesheet" href="{{ asset('css/page/login.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/page/login.css') }}?v={{ filemtime(public_path('css/page/login.css')) }}">
         <link rel="stylesheet" href="{{ asset('css/components/legal-acceptance.css') }}?v={{ filemtime(public_path('css/components/legal-acceptance.css')) }}">
         <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
         @include('layouts.partials.favicon')

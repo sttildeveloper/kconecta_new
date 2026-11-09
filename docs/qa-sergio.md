@@ -120,7 +120,7 @@ Resultado: **196 pruebas correctas, 9 fallidas y 1.332 aserciones**
 - **Aplicado:** el logotipo nuevo WebP se usa en cabecera, pie, catálogo, resultados e inscripción. Se normalizan acciones al azul Kconecta `#1476e8` y los acentos suaves al celeste `#8bd6fa`; el acceso deja 48 px antes del pie.
 - **Pendiente de auditoría visual:** comprobar proporciones del logotipo nuevo y el espaciado en escritorio y móvil.
 
-> Corrección posterior: se descartó el recurso vertical `KC`, que se identificó como el logotipo anterior. Toda la web utiliza ahora el logotipo horizontal aprobado `public/img/kconecta/kconecta_logo.webp`; los dos recursos heredados se retiraron del proyecto. El CTA de WhatsApp de la ficha también se fija a `#1476e8`, anulando el estilo en línea anterior.
+> Corrección posterior: se descartó el recurso vertical `KC`, que se identificó como el logotipo anterior. Toda la web utiliza ahora el logotipo horizontal aprobado `public/img/kconecta/kconecta_logo.webp`; los dos recursos heredados se retiraron del proyecto. El CTA de WhatsApp de la ficha también se fija a `#1476e8`, anulando el estilo en línea anterior. La columna de datos del proveedor pasa a 400-440 px en escritorio y permite partir correos extensos sin desbordar.
 
 ## Riesgos y límites de la revisión
 

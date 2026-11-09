@@ -49,7 +49,7 @@ class ProviderPublicProfilePageTest extends TestCase
         $css = file_get_contents(public_path('css/page/details.css'));
 
         $this->assertIsString($css);
-        $this->assertStringContainsString('minmax(320px, 360px)', $css);
+        $this->assertStringContainsString('minmax(400px, 440px)', $css);
         $this->assertStringContainsString('background: #1476e8', $css);
     }
 }

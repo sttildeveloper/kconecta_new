@@ -1209,9 +1209,9 @@ body {
 }
 
 .container-main-body.is-service-detail {
-    max-width: 1280px;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
-    gap: 28px;
+    max-width: 1360px;
+    grid-template-columns: minmax(0, 1fr) minmax(400px, 440px);
+    gap: 32px;
     margin-top: 1.5rem;
 }
 
@@ -1304,6 +1304,7 @@ body {
 
 .container-main-body.is-service-detail .container-column-2 {
     gap: 0;
+    min-width: 0;
 }
 
 .container-main-body.is-service-detail .container-column-2 .container-details-contact-owner {
@@ -1355,8 +1356,11 @@ body {
 }
 
 .container-main-body.is-service-detail .container-column-2 .details-user-post .data-row-in .span-value {
+    display: block;
     color: #263b55;
     overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.4;
 }
 
 .provider-sidebar-links a.primary {

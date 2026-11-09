@@ -217,8 +217,8 @@ body {
 }
 
 .container-main #lila {
-  background: var(--color-main-1);
-  border: 1px solid var(--color-main-1);
+  background: #1476e8;
+  border: 1px solid #1476e8;
 }
 
 .container-main button:active {
