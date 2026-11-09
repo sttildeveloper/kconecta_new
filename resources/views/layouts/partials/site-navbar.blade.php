@@ -3,7 +3,7 @@
 <header class="kc-header" data-home-header>
     <div class="kc-header__inner">
         <a class="kc-brand" href="{{ route('home') }}" aria-label="Kconecta, inicio">
-            <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta">
+            <img src="{{ asset('img/kconecta/kconecta_icon.webp') }}" alt="Kconecta">
         </a>
         <button class="kc-menu-button" type="button" aria-expanded="false" aria-controls="kc-navigation" data-home-menu-button>
             <span class="sr-only">Abrir menú</span><span></span><span></span><span></span>

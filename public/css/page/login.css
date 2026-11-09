@@ -33,15 +33,15 @@
 }
 body {
   font-family: "Poppins", sans-serif;
-  background: #f6f5f7;
+  background: #f2f8fc;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   min-height: 100vh;
   height: auto;
   margin: 0;
-  padding: 1rem 0;
+  padding: 52px 0 0;
   overflow-y: auto;
 }
 
@@ -80,7 +80,7 @@ body {
 }
 
 .container-main a {
-  color: #228be6;
+  color: #1476e8;
   font-size: 14px;
   text-decoration: none;
   margin: 15px 0;
@@ -100,6 +100,8 @@ body {
   max-width: 100%;
   height: min(95vh, 48rem);
   min-height: 38rem;
+  flex-shrink: 0;
+  margin-bottom: 48px;
 }
 
 .container-main .form-container form {
@@ -272,7 +274,7 @@ body {
 
 .container-main .overlay {
     /* background-color: blue; */
-    background: linear-gradient(to bottom, #0f4b86, #08173f);
+    background: #1476e8;
   /* background: #ff416c;
   background: linear-gradient(to right, #ff4b2b, #ff416c) no-repeat 0 0 / cover; */
   color: #fff;
@@ -306,7 +308,7 @@ body {
 
 .container-main .overlay-left {
   /* background: #be4bdb; */
-  background-color: var(--color-main-1);
+  background-color: #1476e8;
   transition: translateX(-20%);
 }
 

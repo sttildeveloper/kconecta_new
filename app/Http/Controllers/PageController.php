@@ -952,13 +952,21 @@ class PageController extends Controller
 
     private function displayServiceTypeName(string $name): string
     {
-        return trim(strtr($name, [
+        return $this->displayLegacyText($name);
+    }
+
+    private function displayLegacyText(string $value): string
+    {
+        return trim(strtr($value, [
             'Alba?iler?a' => 'Albañilería',
+            'Arag?n' => 'Aragón',
             'Asesor?a y dise?o arquitect?nico' => 'Asesoría y diseño arquitectónico',
+            'Catalu?a' => 'Cataluña',
             'Carpinter?a' => 'Carpintería',
             'Cerrajer?a' => 'Cerrajería',
             'Cristaler?a' => 'Cristalería',
             'Decoraci?n de interiores' => 'Decoración de interiores',
+            'Espa?a' => 'España',
             'Fontaner?a' => 'Fontanería',
             'Fumigaci?n y control de plagas' => 'Fumigación y control de plagas',
             'Instalaci?n de equipos' => 'Instalación de equipos',
@@ -1053,6 +1061,7 @@ class PageController extends Controller
         if ($providerDisplayName === '') {
             $providerDisplayName = 'Proveedor';
         }
+        $providerDisplayName = $this->displayLegacyText($providerDisplayName);
 
         $providerPhone = $provider->provider_phone ?: $provider->provider_landline_phone;
         $providerWhatsappPhone = preg_replace('/\D+/', '', (string) $providerPhone);
@@ -1069,6 +1078,7 @@ class PageController extends Controller
         $profileAddressLabel = ! empty($profileAddressParts)
             ? implode(', ', $profileAddressParts)
             : trim((string) ($provider->address ?? ''));
+        $profileAddressLabel = $this->displayLegacyText($profileAddressLabel);
 
         $providerProfileTitle = trim((string) ($provider->provider_title ?? ''));
         if ($providerProfileTitle === '') {
@@ -1077,6 +1087,7 @@ class PageController extends Controller
         if ($providerProfileTitle === '') {
             $providerProfileTitle = $providerDisplayName;
         }
+        $providerProfileTitle = $this->displayLegacyText($providerProfileTitle);
 
         $serviceCards = [];
         foreach ($services as $service) {
@@ -1101,12 +1112,12 @@ class PageController extends Controller
 
             $serviceCards[] = [
                 'id' => (int) $service->id,
-                'title' => trim((string) ($service->title ?? '')) !== '' ? (string) $service->title : $providerProfileTitle,
-                'description' => (string) ($service->description ?? ''),
-                'availability' => (string) ($service->availability ?? ''),
+                'title' => $this->displayLegacyText(trim((string) ($service->title ?? '')) !== '' ? (string) $service->title : $providerProfileTitle),
+                'description' => $this->displayLegacyText((string) ($service->description ?? '')),
+                'availability' => $this->displayLegacyText((string) ($service->availability ?? '')),
                 'page_url' => (string) ($service->page_url ?? ''),
                 'updated_at_text' => $this->formatUpdatedAt($service->updated_at),
-                'address_label' => $addressLabel,
+                'address_label' => $this->displayLegacyText($addressLabel),
                 'cover_image_url' => $cover && ! empty($cover->url)
                     ? asset('img/uploads/'.ltrim((string) $cover->url, '/'))
                     : null,
@@ -1169,6 +1180,7 @@ class PageController extends Controller
         $providerTypeNames = $providerTypeLinks
             ->map(fn ($typeId) => $serviceTypesById->get((int) $typeId)?->name)
             ->filter()
+            ->map(fn ($name) => $this->displayServiceTypeName((string) $name))
             ->unique()
             ->values()
             ->all();
@@ -1187,6 +1199,7 @@ class PageController extends Controller
         if ($providerDescription === '') {
             $providerDescription = 'Proveedor de servicios registrado en Kconecta.';
         }
+        $providerDescription = $this->displayLegacyText($providerDescription);
 
         $providerUpdatedAt = $services->max('updated_at') ?: $provider->updated_at;
         $ratingSummary = app(ServiceRatingService::class)->providerRatingSummary((int) $provider->id);
@@ -1195,7 +1208,7 @@ class PageController extends Controller
             'provider' => [
                 'id' => (int) $provider->id,
                 'name' => $providerDisplayName,
-                'user_name' => (string) ($provider->user_name ?? ''),
+                'user_name' => $this->displayLegacyText((string) ($provider->user_name ?? '')),
                 'email' => (string) ($provider->email ?? ''),
                 'phone' => (string) ($providerPhone ?? ''),
                 'whatsapp_phone' => $providerWhatsappPhone,

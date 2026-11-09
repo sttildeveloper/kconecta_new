@@ -43,7 +43,7 @@
 }
 
 .kc-brand { display: flex; flex: 0 0 auto; align-items: center; }
-.kc-brand img { display: block; width: 142px; height: auto; }
+.kc-brand img { display: block; width: 72px; height: 58px; object-fit: contain; }
 
 .kc-navigation {
     display: flex;
@@ -122,6 +122,6 @@
 @media (max-width: 680px) {
     .kc-header { padding: 12px; }
     .kc-header__inner { min-height: 65px; padding: 9px 17px; border-radius: 22px; }
-    .kc-brand img { width: 118px; }
+    .kc-brand img { width: 56px; height: 46px; }
     .kc-navigation { top: 82px; right: 12px; left: 12px; }
 }

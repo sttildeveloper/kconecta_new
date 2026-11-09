@@ -29,7 +29,7 @@ class ProviderLandingHeroTest extends TestCase
             ->assertSee('name="password"', false)
             ->assertSee('name="terms_accepted"', false)
             ->assertSee('img/kconecta/shop.webp')
-            ->assertSee('img/kconecta/kconecta_logo.webp')
+            ->assertSee('img/kconecta/kconecta_icon.webp')
             ->assertDontSee('Formulario demostrativo', false);
 
         $this->assertStringContainsString('provider-registration.css', $response->getContent());

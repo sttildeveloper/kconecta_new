@@ -27,7 +27,7 @@ class ServicesCatalogTest extends TestCase
             ->assertSee('img/kconecta/otros-servicios.svg')
             ->assertSee('Calefacción')
             ->assertSee('img/kconecta/service-types/fontaneria.webp')
-            ->assertSee('img/kconecta/kconecta_logo.webp')
+            ->assertSee('img/kconecta/kconecta_icon.webp')
             ->assertDontSee('cat-lampista.jpg');
     }
 

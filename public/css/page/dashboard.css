@@ -6,7 +6,7 @@
   --dash-text: #0b1324;
   --dash-muted: #5b677a;
   --dash-border: #e2e7ef;
-  --dash-accent: #63c4ca;
+  --dash-accent: #1476e8;
   --dash-deep: #0b2545;
   --dash-deep-2: #123a6b;
   --dash-success: #18a999;
@@ -1244,7 +1244,7 @@ body {
   grid-template-columns: minmax(220px, 1.1fr) minmax(200px, 1fr) minmax(220px, 1.2fr) minmax(200px, 1fr) 180px;
   gap: 1rem;
   padding: 0.9rem 1.15rem;
-  background: #63c4ca;
+  background: #1476e8;
   color: #ffffff;
   font-size: 0.82rem;
   font-weight: 800;
@@ -2623,7 +2623,7 @@ body {
   align-items: center;
   gap: 1rem;
   padding: 0.9rem 1.15rem;
-  background: #63c4ca;
+  background: #1476e8;
   color: #ffffff;
   font-size: 0.82rem;
   font-weight: 800;

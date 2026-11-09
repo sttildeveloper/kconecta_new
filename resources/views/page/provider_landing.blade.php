@@ -11,12 +11,16 @@
     <link rel="stylesheet" href="{{ asset('css/page/provider-registration.css') }}?v={{ filemtime(public_path('css/page/provider-registration.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/components/legal-acceptance.css') }}?v={{ filemtime(public_path('css/components/legal-acceptance.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/components/site-footer.css') }}?v={{ filemtime(public_path('css/components/site-footer.css')) }}">
+    <style>
+        .provider-logo { width: 64px; height: 56px; object-fit: contain; }
+        @media (max-width: 850px) { .provider-logo { width: 54px; height: 46px; } }
+    </style>
 </head>
 <body>
 <main class="provider-page">
     <header class="provider-topbar" aria-label="Navegación de inscripción">
         <a class="provider-back" href="{{ url('/') }}" aria-label="Volver al inicio">‹</a>
-        <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta" class="provider-logo">
+        <img src="{{ asset('img/kconecta/kconecta_icon.webp') }}" alt="Kconecta" class="provider-logo">
         <p class="provider-location"><span aria-hidden="true">⌖</span><strong>Tu perfil</strong><small>Registro de profesional</small></p>
     </header>
 

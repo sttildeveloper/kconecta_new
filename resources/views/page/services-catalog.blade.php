@@ -13,7 +13,7 @@
 <main class="services-page">
     <header class="services-topbar" aria-label="Navegación de servicios">
         <a class="services-back" href="{{ url('/') }}" aria-label="Volver al inicio">‹</a>
-        <img src="{{ asset('img/kconecta/kconecta_logo.webp') }}" alt="Kconecta" class="services-logo">
+        <img src="{{ asset('img/kconecta/kconecta_icon.webp') }}" alt="Kconecta" class="services-logo">
         <p class="services-location"><span aria-hidden="true">⌖</span><strong>Ubicación</strong><small>Selecciona un servicio</small></p>
     </header>
 

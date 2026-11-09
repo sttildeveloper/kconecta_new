@@ -38,7 +38,7 @@
                 margin: 0 0 1.1rem;
             }
             .verify-btn {
-                background: #59c4cc;
+                background: #1476e8;
                 color: #fff;
                 border: 0;
                 border-radius: .5rem;

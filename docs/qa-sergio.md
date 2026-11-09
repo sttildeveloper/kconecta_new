@@ -101,6 +101,25 @@ Resultado: **196 pruebas correctas, 9 fallidas y 1.332 aserciones**
   credenciales configuradas. La prueba de alta valida además que se emite la
   notificación `VerifyEmail` para el proveedor recién registrado.
 
+### QA-013 — ficha pública de proveedor
+
+- **Reportado por:** Sergio (QA).
+- **Observación:** la columna de perfil resultaba demasiado estrecha y algunos
+  nombres y ubicaciones mostraban caracteres heredados como `Catalu?a`.
+- **Aplicado:** la columna lateral pasa a un rango de 320–360 px en escritorio,
+  con tarjetas, bordes y CTA alineados con el azul Kconecta. La normalización se
+  extiende a los textos de perfil, dirección, especialidades y servicios, sin
+  modificar los registros MySQL.
+- **Pendiente de auditoría visual:** validar la ficha en escritorio y móvil con
+  proveedores de nombre, dirección y correo extensos.
+
+### QA-014 — identidad visual en acceso y navegación
+
+- **Reportado por:** Sergio (QA).
+- **Observación:** el acceso conservaba el panel azul oscuro, acciones turquesa y el pie mostraba el logotipo anterior. La tarjeta de acceso quedaba demasiado próxima al pie.
+- **Aplicado:** el logotipo nuevo WebP se usa en cabecera, pie, catálogo, resultados e inscripción. Se normalizan acciones al azul Kconecta `#1476e8` y los acentos suaves al celeste `#8bd6fa`; el acceso deja 48 px antes del pie.
+- **Pendiente de auditoría visual:** comprobar proporciones del logotipo nuevo y el espaciado en escritorio y móvil.
+
 ## Riesgos y límites de la revisión
 
 - La batería automática valida contratos y regresiones, pero no sustituye la
