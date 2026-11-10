@@ -27,6 +27,8 @@ class HomePageTest extends TestCase
             ->assertSee('Usar mi ubicación')
             ->assertSee('Escribir dirección en este lugar')
             ->assertSee('Servicios para el hogar')
+            ->assertSee('Reformas y reparaciones en general')
+            ->assertDontSee('Lampista, reformas y más servicios')
             ->assertSee('Ofrezco servicios')
             ->assertSee('Eres un profesional o manitas')
             ->assertSee('Inscríbete gratuitamente y gana visibilidad')
