@@ -59,6 +59,7 @@
                         @include('auth.partials.legal-acceptance', ['legalCheckboxPrefix' => 'provider-landing'])
                         <button type="submit">Inscribirme gratis</button>
                         <p class="provider-form-note">Te enviaremos un correo para verificar tu cuenta.</p>
+                        <p class="provider-form-note">&iquest;Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesi&oacute;n</a> o <a href="{{ route('password.request') }}">restablece tu contrase&ntilde;a</a>.</p>
                     </form>
                 </section>
             </div>

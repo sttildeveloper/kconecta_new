@@ -151,6 +151,7 @@
                     <span class="span-redirect-page" onclick="window.location='{{ route('login') }}'">
                         &iquest;Ya tienes cuenta? Inicia sesi&oacute;n
                     </span>
+                    <a href="{{ route('password.request') }}">&iquest;Olvidaste tu contrase&ntilde;a?</a>
                 </form>
             </div>
 

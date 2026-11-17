@@ -52,12 +52,22 @@
                 font-weight: 600;
                 min-width: 140px;
             }
+            .verify-card form + form {
+                margin-top: .65rem;
+            }
         </style>
     </head>
     <body>
         <div class="verify-card">
             <h1>Verifica tu correo electr&oacute;nico</h1>
             <p>Revisa tu bandeja y confirma tu cuenta desde el enlace enviado.</p>
+            @if (session('status') === 'verification-link-sent')
+                <p role="status">Te hemos enviado un nuevo enlace de verificaci&oacute;n.</p>
+            @endif
+            <form method="POST" action="{{ route('verification.send') }}">
+                @csrf
+                <button type="submit" class="verify-btn">Reenviar enlace</button>
+            </form>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="verify-btn">Aceptar</button>

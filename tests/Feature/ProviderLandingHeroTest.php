@@ -75,7 +75,9 @@ class ProviderLandingHeroTest extends TestCase
             ->from('/quiero-ser-proveedor')
             ->post('/quiero-ser-proveedor', $payload)
             ->assertRedirect('/quiero-ser-proveedor')
-            ->assertSessionHasErrors('email');
+            ->assertSessionHasErrors([
+                'email' => 'Ya existe una cuenta con este e-mail. Inicia sesión o restablece tu contraseña.',
+            ]);
 
         $this->assertSame(1, User::query()->where('email', 'repetido@test.dev')->count());
         $this->assertDatabaseMissing('provider_services', ['service_type_id' => $serviceType->id]);

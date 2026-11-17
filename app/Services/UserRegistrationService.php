@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Closure;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Services\LegalAcceptanceService;
@@ -86,7 +87,7 @@ class UserRegistrationService
                     'label' => 'E-mail',
                     'value' => $email,
                 ];
-                $validator->errors()->add('email', 'Ya existe un registro con este e-mail.');
+                $validator->errors()->add('email', 'Ya existe una cuenta con este e-mail. Inicia sesión o restablece tu contraseña.');
             }
 
             if ($phone !== '' && User::whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'.',''),'+','') = ?", [$phone])->exists()) {
@@ -140,61 +141,68 @@ class UserRegistrationService
      */
     public function register(array $validatedData): User
     {
-        $user = DB::transaction(function () use ($validatedData) {
-            $email = (string) $validatedData['email'];
-            $userName = $this->normalizeCompanyName((string) ($validatedData['company_name'] ?? ''));
-            $documentType = strtoupper(trim((string) ($validatedData['document_type'] ?? '')));
-            $documentNumber = $this->normalizeDocumentNumber((string) ($validatedData['document_number'] ?? ''));
-            $firstNameInput = trim((string) ($validatedData['first_name'] ?? ''));
-            $firstName = $firstNameInput !== '' ? $firstNameInput : $userName;
-            $lastName = trim((string) ($validatedData['last_name'] ?? ''));
-            $phone = trim((string) ($validatedData['phone'] ?? ''));
-            $landlinePhone = trim((string) ($validatedData['landline_phone'] ?? ''));
+        $email = mb_strtolower(trim((string) $validatedData['email']));
 
-            $user = User::create([
-                'first_name' => $firstName,
-                'last_name' => $lastName !== '' ? $lastName : null,
-                'user_name' => $userName !== '' ? $userName : $firstName,
-                'email' => $email,
-                'phone' => $phone !== '' ? $phone : null,
-                'landline_phone' => $landlinePhone !== '' ? $landlinePhone : null,
-                'provider_phone' => (int) $validatedData['user_level_id'] === User::LEVEL_SERVICE_PROVIDER && $phone !== ''
-                    ? $phone
-                    : null,
-                'provider_landline_phone' => (int) $validatedData['user_level_id'] === User::LEVEL_SERVICE_PROVIDER && $landlinePhone !== ''
-                    ? $landlinePhone
-                    : null,
-                'document_type' => $documentType !== '' ? $documentType : null,
-                'document_number' => $documentNumber !== '' ? $documentNumber : null,
-                'address' => null,
-                'user_level_id' => (int) $validatedData['user_level_id'],
-                'password' => Hash::make($validatedData['password']),
-            ]);
+        $user = $this->withRegistrationEmailLock($email, function () use ($validatedData, $email) {
+            return DB::transaction(function () use ($validatedData, $email) {
+                if (User::query()->whereRaw('LOWER(email) = ?', [$email])->exists()) {
+                    throw $this->duplicateEmailException();
+                }
 
-            UserAddress::create([
-                'user_id' => $user->id,
-                'address' => null,
-                'street_name' => null,
-                'street_number' => null,
-                'neighborhood' => null,
-                'city' => null,
-                'province' => null,
-                'postal_code' => null,
-                'state' => null,
-                'country' => null,
-                'latitude' => null,
-                'longitude' => null,
-                'additional_info' => null,
-            ]);
+                $userName = $this->normalizeCompanyName((string) ($validatedData['company_name'] ?? ''));
+                $documentType = strtoupper(trim((string) ($validatedData['document_type'] ?? '')));
+                $documentNumber = $this->normalizeDocumentNumber((string) ($validatedData['document_number'] ?? ''));
+                $firstNameInput = trim((string) ($validatedData['first_name'] ?? ''));
+                $firstName = $firstNameInput !== '' ? $firstNameInput : $userName;
+                $lastName = trim((string) ($validatedData['last_name'] ?? ''));
+                $phone = trim((string) ($validatedData['phone'] ?? ''));
+                $landlinePhone = trim((string) ($validatedData['landline_phone'] ?? ''));
 
-            app(LegalAcceptanceService::class)->record(
-                $user,
-                $validatedData['legal_acceptances'] ?? [],
-                $validatedData['_acceptance_ip'] ?? null,
-                $validatedData['_acceptance_user_agent'] ?? null,
-            );
+                $user = User::create([
+                    'first_name' => $firstName,
+                    'last_name' => $lastName !== '' ? $lastName : null,
+                    'user_name' => $userName !== '' ? $userName : $firstName,
+                    'email' => $email,
+                    'phone' => $phone !== '' ? $phone : null,
+                    'landline_phone' => $landlinePhone !== '' ? $landlinePhone : null,
+                    'provider_phone' => (int) $validatedData['user_level_id'] === User::LEVEL_SERVICE_PROVIDER && $phone !== ''
+                        ? $phone
+                        : null,
+                    'provider_landline_phone' => (int) $validatedData['user_level_id'] === User::LEVEL_SERVICE_PROVIDER && $landlinePhone !== ''
+                        ? $landlinePhone
+                        : null,
+                    'document_type' => $documentType !== '' ? $documentType : null,
+                    'document_number' => $documentNumber !== '' ? $documentNumber : null,
+                    'address' => null,
+                    'user_level_id' => (int) $validatedData['user_level_id'],
+                    'password' => Hash::make($validatedData['password']),
+                ]);
 
-            return $user;
+                UserAddress::create([
+                    'user_id' => $user->id,
+                    'address' => null,
+                    'street_name' => null,
+                    'street_number' => null,
+                    'neighborhood' => null,
+                    'city' => null,
+                    'province' => null,
+                    'postal_code' => null,
+                    'state' => null,
+                    'country' => null,
+                    'latitude' => null,
+                    'longitude' => null,
+                    'additional_info' => null,
+                ]);
+
+                app(LegalAcceptanceService::class)->record(
+                    $user,
+                    $validatedData['legal_acceptances'] ?? [],
+                    $validatedData['_acceptance_ip'] ?? null,
+                    $validatedData['_acceptance_user_agent'] ?? null,
+                );
+
+                return $user;
+            });
         });
 
         try {
@@ -208,6 +216,39 @@ class UserRegistrationService
         }
 
         return $user;
+    }
+
+    /**
+     * Serialize a registration by email on MySQL to avoid a check-then-insert race.
+     * SQLite-backed tests and non-MySQL environments do not need this database lock.
+     */
+    private function withRegistrationEmailLock(string $email, Closure $callback): User
+    {
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            return $callback();
+        }
+
+        $lockName = 'kc-register:'.substr(hash('sha256', $email), 0, 50);
+        $lock = DB::selectOne('SELECT GET_LOCK(?, 5) AS acquired', [$lockName]);
+
+        if ((int) ($lock->acquired ?? 0) !== 1) {
+            throw ValidationException::withMessages([
+                'email' => 'No se pudo completar el registro. Inténtalo de nuevo.',
+            ]);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            DB::select('SELECT RELEASE_LOCK(?)', [$lockName]);
+        }
+    }
+
+    private function duplicateEmailException(): ValidationException
+    {
+        return ValidationException::withMessages([
+            'email' => 'Ya existe una cuenta con este e-mail. Inicia sesión o restablece tu contraseña.',
+        ]);
     }
 
     public function normalizeDocumentNumber(string $value): string
